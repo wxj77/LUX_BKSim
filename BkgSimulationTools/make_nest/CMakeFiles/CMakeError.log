@@ -1,0 +1,74 @@
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: /afs/slac.stanford.edu/package/gcc/gcc-4/4.0.0/i386_linux24/bin/gcc 
+Build flags: 
+Id flags: 
+
+The output was:
+1
+/tmp/ccYLEhbl.s: Assembler messages:
+/tmp/ccYLEhbl.s:91: Error: suffix or operands invalid for `push'
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: /afs/slac.stanford.edu/package/gcc/gcc-4/4.0.0/i386_linux24/bin/gcc 
+Build flags: 
+Id flags: -c
+
+The output was:
+1
+/tmp/cczxXA4y.s: Assembler messages:
+/tmp/cczxXA4y.s:91: Error: suffix or operands invalid for `push'
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: /afs/slac.stanford.edu/package/gcc/gcc-4/4.0.0/i386_linux24/bin/gcc 
+Build flags: 
+Id flags: -Aa
+
+The output was:
+1
+<command line>:1:2: error: missing '(' after predicate
+
+
+Checking whether the C compiler is IAR using "" did not match "IAR .+ Compiler":
+gcc: no input files
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /afs/slac.stanford.edu/package/gcc/gcc-4/4.0.0/i386_linux24/bin/g++ 
+Build flags: 
+Id flags: 
+
+The output was:
+1
+/tmp/ccn0ZumC.s: Assembler messages:
+/tmp/ccn0ZumC.s:92: Error: suffix or operands invalid for `push'
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /afs/slac.stanford.edu/package/gcc/gcc-4/4.0.0/i386_linux24/bin/g++ 
+Build flags: 
+Id flags: -c
+
+The output was:
+1
+/tmp/ccg1ogHF.s: Assembler messages:
+/tmp/ccg1ogHF.s:92: Error: suffix or operands invalid for `push'
+
+
+Checking whether the CXX compiler is IAR using "" did not match "IAR .+ Compiler":
+g++: no input files
+Determining if the C compiler works failed with the following output:
+Change Dir: /nfs/farm/g/superb/u01/lz/wxj/BackgroundModel/BkgSimulationTools/make_nest/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec2664560763/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec2664560763.dir/build.make CMakeFiles/cmTryCompileExec2664560763.dir/build
+gmake[1]: Entering directory `/nfs/farm/g/superb/u01/lz/wxj/BackgroundModel/BkgSimulationTools/make_nest/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /nfs/farm/g/superb/u01/lz/wxj/BackgroundModel/BkgSimulationTools/make_nest/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2664560763.dir/testCCompiler.c.o
+/afs/slac.stanford.edu/package/gcc/gcc-4/4.0.0/i386_linux24/bin/gcc    -o CMakeFiles/cmTryCompileExec2664560763.dir/testCCompiler.c.o   -c /nfs/farm/g/superb/u01/lz/wxj/BackgroundModel/BkgSimulationTools/make_nest/CMakeFiles/CMakeTmp/testCCompiler.c
+/tmp/cccx0dyR.s: Assembler messages:
+/tmp/cccx0dyR.s:6: Error: suffix or operands invalid for `push'
+gmake[1]: Leaving directory `/nfs/farm/g/superb/u01/lz/wxj/BackgroundModel/BkgSimulationTools/make_nest/CMakeFiles/CMakeTmp'
+gmake[1]: *** [CMakeFiles/cmTryCompileExec2664560763.dir/testCCompiler.c.o] Error 1
+gmake: *** [cmTryCompileExec2664560763/fast] Error 2
+
+

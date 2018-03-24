@@ -1,0 +1,31 @@
+#OS := $(shell uname)
+#ifeq ($(OS),Darwin)
+# CC=clang++
+#else
+# CC=g++
+#endif
+####need to change this######
+NESTPATH=/nfs/farm/g/superb/u01/lz/wxj/BackgroundModel/BkgSimulationTools/LibNEST_JC/
+####end
+
+CC=g++
+ifeq ($(NESTPATH),)
+        NESTPATH=/cvmfs/lz.opensciencegrid.org/fastNEST/release-2.10.0/libNEST/
+endif
+ifeq ($(NESTDATA),)
+        NESTDATA=/cvmfs/lz.opensciencegrid.org/fastNEST/release-2.10.0/LCEAndEFieldMaps/
+endif
+
+CFLAGS=-Wall -g -O3 -I`root-config --incdir` -I$(NESTPATH)
+LDFLAGS=`root-config --ldflags --libs`
+
+NESTCXX=$(NESTPATH)NEST.cxx
+#NESTCPP=$(NESTPATH)NEST.cpp
+#TESTNESTCPP=$(NESTPATH)testNEST.cpp
+
+all:
+	$(CC) $(CFLAGS) generateFastBkg.cc $(NESTCXX) -o generateFastBkg $(LDFLAGS)
+#	$(CC) $(CFLAGS) generateFastBkg_new.cc $(NESTCPP) $(TESTNESTCPP) -o generateFastBkg1 $(LDFLAGS)
+
+clean:
+	rm -f generateFastBkg

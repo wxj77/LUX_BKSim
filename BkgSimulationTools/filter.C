@@ -1,0 +1,298 @@
+#include <stdlib.h>
+#include <TROOT.h>
+#include <TChain.h>
+#include <TTree.h>
+#include <TFile.h>
+#include <TPad.h>
+#include <TCanvas.h>
+#include <TH1F.h>
+#include <TMath.h>
+#include <iostream>
+#include <fstream>
+#include "Parameters.h"
+
+using namespace std;
+
+Float_t x_cm, y_cm, z_cm, r_cm, phi_in;
+Float_t x_s2_cm, y_s2_cm, dt_s2, r_s2_cm, phi_s2;
+Float_t s1_raw, s1c, s2_raw, s2c; //, log10S2;
+
+TFile *f =TFile::Open("tB1_fidCut.root");
+TH2D* h_rmax1 = (TH2D*)f->Get("hist");
+h_rmax1->SetDirectory(0);
+f->Close();
+
+TFile *f2 =TFile::Open("tB2_fidCut.root");
+TH2D* h_rmax2 = (TH2D*)f2->Get("hist");
+h_rmax2->SetDirectory(0);
+f2->Close();
+
+TFile *f3 =TFile::Open("tB3_fidCut.root");
+TH2D* h_rmax3 = (TH2D*)f3->Get("hist");
+h_rmax3->SetDirectory(0);
+f3->Close();
+
+TFile *f4 =TFile::Open("tB4_fidCut.root");
+TH2D* h_rmax4 = (TH2D*)f4->Get("hist");
+h_rmax4->SetDirectory(0);
+f4->Close();
+
+bool GoldenEvent(int);
+
+template <typename T>
+string NumberToString ( T Number )
+{
+   ostringstream ss;
+   ss << Number;
+   return ss.str();
+}
+
+void filter(TString BkgFileDir, char* type, int TimeBin ){
+
+    TString filterType( type );
+	cout<<BkgFileDir<<endl;
+	TString TimeBinStr = NumberToString(TimeBin);
+
+    // Create chain with the original RQ files, containing all the events
+    TChain *ch1 = new TChain("events");
+    
+    //Load the correct files to the chain based on input name
+    //if( filterType = "Ex_All" ){
+    if( filterType.EqualTo("Ex_All") ){
+       //cryostat w/o Th232E
+       ch1->Add(BkgFileDir+"/CRYOSTAT/K40/TB"+TimeBinStr+"/"+"CRYOSTAT_K40_Nested.root");
+       ch1->Add(BkgFileDir+"/CRYOSTAT/Ra226/TB"+TimeBinStr+"/"+"CRYOSTAT_Ra226_Nested.root");
+       ch1->Add(BkgFileDir+"/CRYOSTAT/Sc46/TB"+TimeBinStr+"/"+"CRYOSTAT_Sc46_Nested.root");
+       ch1->Add(BkgFileDir+"/CRYOSTAT/Th232L/TB"+TimeBinStr+"/"+"CRYOSTAT_Th232L_Nested.root");
+       //FCSHIELD w/o Th232E --  maybe an error here?
+       ch1->Add(BkgFileDir+"/FCSHIELD/Co60/TB"+TimeBinStr+"/"+"FCSHIELD_Co60_Nested.root");
+       ch1->Add(BkgFileDir+"/FCSHIELD/Ra226/TB"+TimeBinStr+"/"+"FCSHIELD_Ra226_Nested.root");
+       ch1->Add(BkgFileDir+"/FCSHIELD/Th232L/TB"+TimeBinStr+"/"+"FCSHIELD_Th232L_Nested.root");
+       //FIELDGRID
+       ch1->Add(BkgFileDir+"/FIELDGRID/Co60/TB"+TimeBinStr+"/"+"FIELDGRID_Co60_Nested.root");
+       ch1->Add(BkgFileDir+"/FIELDGRID/K40/TB"+TimeBinStr+"/"+"FIELDGRID_K40_Nested.root");
+       ch1->Add(BkgFileDir+"/FIELDGRID/Ra226/TB"+TimeBinStr+"/"+"FIELDGRID_Ra226_Nested.root");
+       ch1->Add(BkgFileDir+"/FIELDGRID/Th232L/TB"+TimeBinStr+"/"+"FIELDGRID_Th232L_Nested.root");
+       //FIELDRING
+       ch1->Add(BkgFileDir+"/FIELDRING/Co60/TB"+TimeBinStr+"/"+"FIELDRING_Co60_Nested.root");
+       ch1->Add(BkgFileDir+"/FIELDRING/Ra226/TB"+TimeBinStr+"/"+"FIELDRING_Ra226_Nested.root");
+       ch1->Add(BkgFileDir+"/FIELDRING/Th232L/TB"+TimeBinStr+"/"+"FIELDRING_Th232L_Nested.root");
+       //HDPE
+       ch1->Add(BkgFileDir+"/HDPE/Ra226/TB"+TimeBinStr+"/"+"HDPE_Ra226_Nested.root");
+       ch1->Add(BkgFileDir+"/HDPE/Th232L/TB"+TimeBinStr+"/"+"HDPE_Th232L_Nested.root");
+       //MYLAR
+       ch1->Add(BkgFileDir+"/MYLAR/K40/TB"+TimeBinStr+"/"+"MYLAR_K40_Nested.root");
+       ch1->Add(BkgFileDir+"/MYLAR/Ra226/TB"+TimeBinStr+"/"+"MYLAR_Ra226_Nested.root");
+       ch1->Add(BkgFileDir+"/MYLAR/Th232L/TB"+TimeBinStr+"/"+"MYLAR_Th232L_Nested.root");
+       //PMTMOUNT
+       ch1->Add(BkgFileDir+"/PMTMOUNT/Co60/TB"+TimeBinStr+"/"+"PMTMOUNT_Co60_Nested.root");
+       ch1->Add(BkgFileDir+"/PMTMOUNT/Ra226/TB"+TimeBinStr+"/"+"PMTMOUNT_Ra226_Nested.root");
+       ch1->Add(BkgFileDir+"/PMTMOUNT/Th232L/TB"+TimeBinStr+"/"+"PMTMOUNT_Th232L_Nested.root");
+       //PTFE and REFLECTOR
+       ch1->Add(BkgFileDir+"/PTFE/Ra226/TB"+TimeBinStr+"/"+"PTFE_Ra226_Nested.root");
+       ch1->Add(BkgFileDir+"/PTFE/Th232L/TB"+TimeBinStr+"/"+"PTFE_Th232L_Nested.root");
+       ch1->Add(BkgFileDir+"/REFLECTOR/Ra226/TB"+TimeBinStr+"/"+"REFLECTOR_Ra226_Nested.root");
+       ch1->Add(BkgFileDir+"/REFLECTOR/Th232L/TB"+TimeBinStr+"/"+"REFLECTOR_Th232L_Nested.root");
+       //THERMALSHIELD
+       ch1->Add(BkgFileDir+"/THERMALSHIELD/K40/TB"+TimeBinStr+"/"+"THERMALSHIELD_K40_Nested.root");
+       ch1->Add(BkgFileDir+"/THERMALSHIELD/Ra226/TB"+TimeBinStr+"/"+"THERMALSHIELD_Ra226_Nested.root");
+       ch1->Add(BkgFileDir+"/THERMALSHIELD/Th232L/TB"+TimeBinStr+"/"+"THERMALSHIELD_Th232L_Nested.root");
+       //TOPSHIELD
+       ch1->Add(BkgFileDir+"/TOPSHIELD/Co60/TB"+TimeBinStr+"/"+"TOPSHIELD_Co60_Nested.root");
+       ch1->Add(BkgFileDir+"/TOPSHIELD/Ra226/TB"+TimeBinStr+"/"+"TOPSHIELD_Ra226_Nested.root");
+       ch1->Add(BkgFileDir+"/TOPSHIELD/Th232L/TB"+TimeBinStr+"/"+"TOPSHIELD_Th232L_Nested.root");
+    }else if( filterType.EqualTo("Ex_Th232") ){
+       ch1->Add(BkgFileDir+"/CRYOSTAT/Th232E/TB"+TimeBinStr+"/"+"CRYOSTAT_Th232E_Nested.root");
+       ch1->Add(BkgFileDir+"/FCSHIELD/Th232E/TB"+TimeBinStr+"/"+"FCSHIELD_Th232E_Nested.root");
+       ch1->Add(BkgFileDir+"/FIELDGRID/Th232E/TB"+TimeBinStr+"/"+"FIELDGRID_Th232E_Nested.root");
+       ch1->Add(BkgFileDir+"/FIELDRING/Th232E/TB"+TimeBinStr+"/"+"FIELDRING_Th232E_Nested.root");
+       ch1->Add(BkgFileDir+"/HDPE/Th232E/TB"+TimeBinStr+"/"+"HDPE_Th232E_Nested.root");
+       ch1->Add(BkgFileDir+"/MYLAR/Th232E/TB"+TimeBinStr+"/"+"MYLAR_Th232E_Nested.root");
+       ch1->Add(BkgFileDir+"/PMTMOUNT/Th232E/TB"+TimeBinStr+"/"+"PMTMOUNT_Th232E_Nested.root");
+       ch1->Add(BkgFileDir+"/PTFE/Th232E/TB"+TimeBinStr+"/"+"PTFE_Th232E_Nested.root");
+       ch1->Add(BkgFileDir+"/REFLECTOR/Th232E/TB"+TimeBinStr+"/"+"REFLECTOR_Th232E_Nested.root");
+       ch1->Add(BkgFileDir+"/THERMALSHIELD/Th232E/TB"+TimeBinStr+"/"+"THERMALSHIELD_Th232E_Nested.root");
+       ch1->Add(BkgFileDir+"/TOPSHIELD/Th232E/TB"+TimeBinStr+"/"+"TOPSHIELD_Th232E_Nested.root");
+    }else if( filterType.EqualTo("FCS_Co60") ){
+        ch1->Add(BkgFileDir+"/FCSHIELDPLANE/Co60/TB"+TimeBinStr+"/"+"FCSHIELDPLANE_Co60_Nested.root");
+    }else if( filterType.EqualTo("FCS_Pb212") ){
+        ch1->Add(BkgFileDir+"/FCSHIELDPLANE/Pb212/TB"+TimeBinStr+"/"+"FCSHIELDPLANE_Pb212_Nested.root");
+    }else if( filterType.EqualTo("FCS_Ra226") ){
+        ch1->Add(BkgFileDir+"/FCSHIELDPLANE/Ra226/TB"+TimeBinStr+"/"+"FCSHIELDPLANE_Ra226_Nested.root");
+    }else if( filterType.EqualTo("FCS_Tl208") ){
+        ch1->Add(BkgFileDir+"/FCSHIELDPLANE_Tl208/TB"+TimeBinStr+"/"+"FCSHIELDPLANE_Tl208_Nested.root");
+    }else if( filterType.EqualTo("PMTB_All") ){
+       ch1->Add(BkgFileDir+"/PMTB/Co60/TB"+TimeBinStr+"/"+"PMTB_Co60_Nested.root");
+       ch1->Add(BkgFileDir+"/PMTB/K40/TB"+TimeBinStr+"/"+"PMTB_K40_Nested.root");
+       ch1->Add(BkgFileDir+"/PMTB/Ra226/TB"+TimeBinStr+"/"+"PMTB_Ra226_Nested.root");
+       ch1->Add(BkgFileDir+"/PMTB/Th232L/TB"+TimeBinStr+"/"+"PMTB_Th232L_Nested.root");
+    }else if( filterType.EqualTo("PMTB_Th232") ){
+       ch1->Add(BkgFileDir+"/PMTB/Th232E/TB"+TimeBinStr+"/"+"PMTB_Th232E_Nested.root");
+    }else if( filterType.EqualTo("PMTT_All") ){
+       ch1->Add(BkgFileDir+"/PMTT/Co60/TB"+TimeBinStr+"/PMTT_Co60_Nested.root");
+       ch1->Add(BkgFileDir+"/PMTT/K40/TB"+TimeBinStr+"/PMTT_K40_Nested.root");
+       ch1->Add(BkgFileDir+"/PMTT/Ra226/TB"+TimeBinStr+"/PMTT_Ra226_Nested.root");
+       ch1->Add(BkgFileDir+"/PMTT/Th232L/TB"+TimeBinStr+"/PMTT_Th232L_Nested.root");
+    }else if( filterType.EqualTo("PMTT_Th232") ){
+       ch1->Add(BkgFileDir+"/PMTT/Th232E/TB"+TimeBinStr+"/"+"PMTT_Th232E_Nested.root");
+    }else if( filterType.EqualTo("Xe_Kr85") ){
+       ch1->Add(BkgFileDir+"/XENON/Kr85/TB"+TimeBinStr+"/"+"XENON_Kr85_Nested.root");
+    }else if( filterType.EqualTo("Xe_Rn220") ){
+       ch1->Add(BkgFileDir+"/XENON/Rn220/TB"+TimeBinStr+"/"+"XENON_Rn220_Nested.root");
+    }else if( filterType.EqualTo("Xe_Rn222") ){
+       ch1->Add(BkgFileDir+"/XENON/Rn222/TB"+TimeBinStr+"/"+"XENON_Rn222_Nested.root");
+    }else if( filterType.EqualTo("Xe_Xe127") ){
+       ch1->Add(BkgFileDir+"/XENON/Xe127/TB"+TimeBinStr+"/"+"XENON_Xe127_Nested.root");
+    }
+    
+    // Open the root file where golden events will be written
+    TString tb_str = TString::Format("tb%d",TimeBin);
+    system("mkdir "+BkgFileDir+"/"+"bkgModelInputs");
+    TFile *hfile = new TFile(BkgFileDir+"/"+"bkgModelInputs/golden"+filterType+"_"+tb_str+"_fidCut.root","RECREATE");
+    
+    // Now the new TTree, containing only golden events
+    TTree *golden = new TTree("golden","Distilled TTree, containing only golden events");
+
+    // Now the n-tuple and histogram for the important information
+  //  TNtuple *ntuple = new TNtuple("ntuple","Radius,Z_cm,Phi,S1Area,log10S2,RawS2","r:z:phi:S1:log10S2:rawS2");
+    //TH1F *S1Area = new TH1F("S1Area", "S1Area", 50, 0, 250);
+   // TH1F *SS1Area = new TH1F("SS1Area", "SS1Area", 50, 0, 250);
+    //TH1F *S2Area = new TH1F("S2Area", "S2Area", 250, 0, 8000);
+    //TH1F *ZDrift = new TH1F("ZDrift", "ZDrift", 350, 0, 350);
+    //TH1F *Radius = new TH1F("Radius", "Radius", 26, 0, 26);
+    //TH1F *RadiusR = new TH1F("RadiusR", "Radius Renormalized", 26, 0, 26);   
+    TH2F* h_rvsz_real = new TH2F("h_R2vsZ_real"," ;r (cm);z (cm)",100,0,26,100,0,60);
+    TH2F* h_rvsz_real_cut = new TH2F("h_R2vsZ_real_cut","Real space cut ;r (cm);z (cm)",100,0,26,100,0,60);
+    TH2F* h_rvsz_real_gold = new TH2F("h_R2vsZ_real_gold","Events that pass fid cut;r (cm);z (cm)",100,0,26,100,0,60);
+    
+    TH2F* h_rvsdt_S2 = new TH2F("h_R2vsDT_S2"," ;r_{S2} (cm);-drift (us)",100,0,26,100,-350,0);
+    TH2F* h_rvsdt_S2_cut = new TH2F("h_R2vsDT_S2_cut","Real space cut ;r_{S2} (cm);-drift (us)",100,0,26,100,-350,0);
+    TH2F* h_rvsdt_S2_gold = new TH2F("h_R2vsDT_S2_gold","Events that pass fid cut;r_{S2} (cm);-drift (us)",100,0,26,100,-350,0);
+    
+    TH2F* h_xvsy_real = new TH2F("h_XvsY_real"," ;x (cm);y (cm)",100,-23,23,100,-23,23);
+    TH2F* h_xvsy_real_gold = new TH2F("h_XvsY_real_gold","Events that pass fid cut;x (cm);y (cm)",100,-23,23,100,-23,23);
+    
+    TH2F* h_xvsy_S2 = new TH2F("h_XvsY_S2"," ;x_{S2} (cm);y_{S2} (cm)",100,-23,23,100,-23,23);
+    TH2F* h_xvsy_S2_gold = new TH2F("h_XvsY_S2_gold","Events that pass fid cut;x_{S2} (cm);y_{S2} (cm)",100,-23,23,100,-23,23);
+    
+    //////////
+    
+    Int_t nentries1 = (Int_t)ch1->GetEntries();
+    cout << "Chain has " << nentries1 << " entries" << endl;
+    
+    // Associate each RQ to the corresponding chain branch
+    //ch1->SetBranchAddress("luxstamp_samples", &luxstamp_samples);
+    ch1->SetBranchAddress("x_cm", &x_cm);
+    ch1->SetBranchAddress("y_cm", &y_cm);
+    ch1->SetBranchAddress("r_cm", &r_cm);
+    ch1->SetBranchAddress("z_cm", &z_cm);
+    ch1->SetBranchAddress("phi", &phi_in);
+    
+    ch1->SetBranchAddress("x_s2_cm", &x_s2_cm);
+    ch1->SetBranchAddress("y_s2_cm", &y_s2_cm);
+    ch1->SetBranchAddress("dt_s2", &dt_s2);
+    ch1->SetBranchAddress("r_s2_cm", &r_s2_cm);
+    ch1->SetBranchAddress("phi_s2", &phi_s2);
+    ch1->SetBranchAddress("s1_raw", &s1_raw);
+    ch1->SetBranchAddress("s1c", &s1c);
+    ch1->SetBranchAddress("s2_raw", &s2_raw);
+    ch1->SetBranchAddress("s2c", &s2c);
+    //ch1->SetBranchAddress("log10S2", &log10S2);
+    
+    bool gold;
+    
+    //These are the RQs we want to keep in the new TTree
+    Float_t r, drift, phi, S1, log10S2, rawS2;
+    
+    golden->Branch("r",&r,"r/F");
+    //golden->Branch("z",&z,"z/F");
+    golden->Branch("drift",&drift,"drift/F");
+    golden->Branch("phi",&phi,"phi/F");
+    golden->Branch("S1",&S1,"S1/F");
+    golden->Branch("log10S2",&log10S2,"log10S2/F");
+    golden->Branch("rawS2",&rawS2,"rawS2/F");
+    
+    // main cycle, through all the events
+    int count = 0;
+    for(Int_t evt=0; evt<nentries1; evt++){
+       if ( evt % 10000 == 0) cout << evt << endl; 
+       ch1->GetEntry(evt);
+       
+       //Decide whether golden or not:
+       gold = GoldenEvent(TimeBin);
+       
+       h_R2vsZ_real->Fill( r_cm, z_cm );
+       h_xvsy_real->Fill( x_cm, y_cm );
+       h_R2vsDT_S2->Fill( r_s2_cm, -dt_s2 );
+       h_xvsy_S2->Fill( x_s2_cm, y_s2_cm );
+       
+       if( r_cm > 20. && gold ){
+          h_R2vsZ_real_cut->Fill( r_cm, z_cm );
+          h_R2vsDT_S2_cut->Fill( r_s2_cm, -dt_s2 );
+       //   h_xvsy_real_cut->Fill( x_cm, y_cm );
+        //  h_xvsy_S2_cut->Fill( x_s2_cm, y_s2_cm );
+
+       }
+       
+       if (gold){
+          r = r_s2_cm;
+          drift = dt_s2;
+          phi = phi_s2;
+          S1 = s1c;
+          log10S2 = log10( s2c );
+          rawS2 = s2_raw; 
+          // Now save this event to the tree
+          golden->Fill();
+	  count++;
+	  
+	  h_rvsz_real_gold->Fill( r_cm, z_cm );
+	  h_xvsy_real_gold->Fill( x_cm, y_cm );
+	  h_rvsdt_S2_gold->Fill( r_s2_cm, -dt_s2 );
+	  h_xvsy_S2_gold->Fill( x_s2_cm, y_s2_cm );
+       }
+       
+    }
+    
+    //Write file and close
+    golden->Write();
+    
+    //save histos
+    h_R2vsZ_real->Write();
+    h_R2vsZ_real_cut->Write();
+    h_rvsz_real_gold->Write();
+    h_R2vsDT_S2->Write();
+    h_R2vsDT_S2_cut->Write();
+    h_rvsdt_S2_gold->Write();
+    
+    h_xvsy_real->Write();
+    h_xvsy_real_gold->Write();
+    h_xvsy_S2->Write();
+    h_xvsy_S2_gold->Write();
+    
+    hfile->Close();
+    cout<<"Saved "<<count<<" golden events"<<endl;
+}
+
+bool GoldenEvent(int timeBin_in) {
+   
+    if( s2_raw > S2RAWTHRESHOLD ){ //raw S2 threshold cut
+    
+       if( dt_s2 > DTMIN && dt_s2 < DTMAX ){
+          
+          if( timeBin_in == 1 && r_s2_cm < h_rmax1->GetBinContent( h_rmax1->FindBin(phi_s2,dt_s2) ) ){
+             return true;
+           }else if( timeBin_in == 2 && r_s2_cm < h_rmax2->GetBinContent( h_rmax2->FindBin(phi_s2,dt_s2) )  ){
+             return true;
+           }else if( timeBin_in == 3 && r_s2_cm < h_rmax3->GetBinContent( h_rmax3->FindBin(phi_s2,dt_s2) )  ){
+             return true;
+           }else if( timeBin_in == 4 && r_s2_cm < h_rmax4->GetBinContent( h_rmax4->FindBin(phi_s2,dt_s2) )  ){
+           
+             return true;
+             
+           }
+       }
+    }
+    
+    return false;
+    
+}

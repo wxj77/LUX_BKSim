@@ -1,0 +1,10 @@
+
+MasterScript1_0_FolderGenerator.sh will set up the file structure to put the events into
+MasterScript1_1_10XR4LiveTime.sh will run the simulations (Values for each set correspond to more than 10X Run04 Live Time (min of 340 live days), with the scaling factors in a google spreadsheet, which I can send you if you don't have it already)
+
+MasterScript1_1_10XR4LiveTime.sh calls MS1Loop_R.sh for each component for the number of batches of 250000 events to simulate.
+
+MS1Loop_R.sh Initiates the jobs on the cluster. This is cluster specific and will need to be rewritten specifically for the queuing system of the cluster you'll be using (written currently for LSF used on Yale cluster).  This script calls LSF_MS1R.sh for each iteration.
+
+LSF_MS1R.sh is the actual script that generates the component of the background model. This generates the macro with EDepMacGenerator_R.sh and then runs it using LUXSim, converts the output to a root file, skims the root file with MakeEventsFile_WS.c before removing the binary and un-skimmed root file.
+
