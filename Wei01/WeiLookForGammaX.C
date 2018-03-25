@@ -1,6 +1,6 @@
 //test run
-//ls ../XENON_Kr85/R4Bkg_XENON_Kr85_100000* >txt.txt 
-//root -b -q -l "./WeiLookForGammaX.C+(\"./txt.txt\", \"test1.root\", \"test2.root\", \"test3.root\",\"test4.root\")"
+//ls ../XENON_Kr85/R4Bkg_XENON_Kr85_100000*.root >txt.txt 
+//root -b -q -l "./WeiLookForGammaX.C+(\"./txt.txt\", \"test1.root\", \"test2.root\", \"test3.root\")"
 
 
 //c lib
@@ -9,6 +9,8 @@
 #include <math.h>
 #include <cmath>
 #include <cstdlib>
+#include <string.h>
+#include <cstring>
 
 //root lib
 #include "TString.h"
@@ -26,8 +28,6 @@
 #include "../BkgSimulationTools/FieldMap.h"
 #include "../BkgSimulationTools/modelBinDef.h"
 
-
-
 using namespace std;
 
 //functions in this file.
@@ -35,6 +35,7 @@ using namespace std;
 const Int_t kMaxTrack=1000;
 struct MySimEvent;
 struct MyClusterEvent;
+struct MyMapNestEvent;
 void load_chain(TString txtFileList, TChain* chain);
 void SaveChain(TString fOutName, TChain* chain);
 
@@ -43,11 +44,11 @@ void set_newtree(TTree* events, MyClusterEvent & e);
 void load_newtree(TTree* events, MyClusterEvent & e);
 void eventLoop(TChain* events, TTree* newtree);
 void Cluster(MySimEvent & e, MyClusterEvent & cl);
-void Map(MyClusterEvent & cl, FieldMap m);
-void eventLoop2(TTree* newtree, TTree* newtree2, int timeBin);
+void set_newtree2(TTree* events, MyMapNestEvent & e);
+void load_newtree2(TTree* events, MyMapNestEvent & e);
 
 //int WeiLookForGammaX(TString fName, TString fOutName1, TString fOutName2);
-int WeiLookForGammaX(TString fName, TString fOutName1, TString fOutName2, TString fOutName3, TString fOutName4);
+int WeiLookForGammaX(TString fName, TString fOutName1, TString fOutName2, TString fOutName3);
 
 
 //------------------------------------------------------------------------------
@@ -82,9 +83,11 @@ struct MyClusterEvent
   Float_t fPositionX_cm[kMaxTrack];//fPositionX_cm[iClusterNum];
   Float_t fPositionY_cm[kMaxTrack];//fPositionY_cm[iClusterNum];
   Float_t fPositionZ_cm[kMaxTrack];//fPositionZ_cm[iClusterNum];
-  Float_t S2X_cm[kMaxTrack];//fPositionX_cm[iClusterNum];
-  Float_t S2Y_cm[kMaxTrack];//fPositionY_cm[iClusterNum];
-  Float_t Drift_us[kMaxTrack];//fPositionZ_cm[iClusterNum];
+
+// Move to a friend struct MyMapNestEvent.
+//  Float_t S2X_cm[kMaxTrack];//fPositionX_cm[iClusterNum];
+//  Float_t S2Y_cm[kMaxTrack];//fPositionY_cm[iClusterNum];
+//  Float_t Drift_us[kMaxTrack];//fPositionZ_cm[iClusterNum];
   Float_t fPrimaryParPosX_mm;
   Float_t fPrimaryParPosY_mm; 
   Float_t fPrimaryParPosZ_mm;
@@ -96,6 +99,23 @@ struct MyClusterEvent
   Float_t posZ; 
   Float_t deltaZ;
   
+};
+
+struct MyMapNestEvent
+{
+  Int_t iClusterNum2; //duplicate of   Int_t iClusterNum;
+  Float_t S2X_cm[kMaxTrack];//fPositionX_cm[iClusterNum];
+  Float_t S2Y_cm[kMaxTrack];//fPositionY_cm[iClusterNum];
+  Float_t Drift_us[kMaxTrack];//fPositionZ_cm[iClusterNum]; 
+  Float_t S1_raw[kMaxTrack];
+  Float_t S1c[kMaxTrack];
+  Float_t S2_raw[kMaxTrack];
+  Float_t S2c[kMaxTrack];
+
+  Float_t s1_raw;
+  Float_t s1c;
+  Float_t s2_raw;
+  Float_t s2c;
 };
 
 void load_chain(TString txtFileList, TChain* chain)
@@ -117,7 +137,7 @@ void SaveChain(TString fOutName, TChain* chain) {
 //save chain to a root file.
   printf("start copytree to merging big chain.");
   printf("%s", fOutName.Data());
-  TFile *fout = TFile::Open(fOutName.Data(),"RECREATE");
+  TFile *fout = new TFile(fOutName.Data(),"RECREATE");
   chain->CloneTree(-1,"fast");
   fout->cd();
   fout->Write();
@@ -182,12 +202,6 @@ void set_newtree(TTree* events, MyClusterEvent & e){
 
   events->Branch("fPositionZ_cm", &e.fPositionZ_cm, "fPositionZ_cm[iClusterNum]/F");
 
-  events->Branch("S2X_cm", &e.S2X_cm, "S2X_cm[iClusterNum]/F");
-
-  events->Branch("S2Y_cm", &e.S2Y_cm, "S2Y_cm[iClusterNum]/F");
-
-  events->Branch("Drift_us", &e.Drift_us, "Drift_us[iClusterNum]/F");
-
   events->Branch("fPrimaryParPosX_mm", &e.fPrimaryParPosX_mm, "fPrimaryParPosX_mm/F");
 
   events->Branch("fPrimaryParPosY_mm", &e.fPrimaryParPosY_mm, "fPrimaryParPosY_mm/F");
@@ -204,7 +218,6 @@ void set_newtree(TTree* events, MyClusterEvent & e){
 
   events->Branch("deltaZ", &e.deltaZ, "deltaZ/F");
 }//set_newtree()
-
 
 void load_newtree(TTree* events, MyClusterEvent & e){
   events->SetBranchStatus("*",0); //disable all
@@ -229,15 +242,6 @@ void load_newtree(TTree* events, MyClusterEvent & e){
 
   events->SetBranchStatus("fPositionZ_cm", 1);
   events->SetBranchAddress("fPositionZ_cm", &e.fPositionZ_cm);
-
-  events->SetBranchStatus("S2X_cm", 1);
-  events->SetBranchAddress("S2X_cm", &e.S2X_cm);
-
-  events->SetBranchStatus("S2Y_cm", 1);
-  events->SetBranchAddress("S2Y_cm", &e.S2Y_cm);
-
-  events->SetBranchStatus("Drift_us", 1);
-  events->SetBranchAddress("Drift_us", &e.Drift_us);
 
   events->SetBranchStatus("fPrimaryParPosX_mm", 1);
   events->SetBranchAddress("fPrimaryParPosX_mm", &e.fPrimaryParPosX_mm);
@@ -269,6 +273,74 @@ void load_newtree(TTree* events, MyClusterEvent & e){
   events->SetBranchStatus("deltaZ", 1);
   events->SetBranchAddress("deltaZ", &e.deltaZ);
 }//load_newtree()
+
+
+void set_newtree2(TTree* events, MyMapNestEvent & e){
+  events->Branch("iClusterNum2", &e.iClusterNum2, "iClusterNum2/I");
+
+  events->Branch("S2X_cm", &e.S2X_cm, "S2X_cm[iClusterNum2]/F");
+
+  events->Branch("S2Y_cm", &e.S2Y_cm, "S2Y_cm[iClusterNum2]/F");
+
+  events->Branch("Drift_us", &e.Drift_us, "Drift_us[iClusterNum2]/F");
+
+  events->Branch("S1_raw", &e.S1_raw, "S1_raw[iClusterNum2]/F");
+
+  events->Branch("S1c", &e.S1c, "S1c[iClusterNum2]/F");
+
+  events->Branch("S2_raw", &e.S2_raw, "S2_raw[iClusterNum2]/F");
+
+  events->Branch("S2c", &e.S2c, "S2c[iClusterNum2]/F");
+
+  events->Branch("s1_raw", &e.s1_raw, "s1_raw/F");
+
+  events->Branch("s1c", &e.s1c, "s1c/F");
+
+  events->Branch("s2_raw", &e.s2_raw, "s2_raw/F");
+
+  events->Branch("s2c", &e.s2c, "s2c/F");
+}
+
+void load_newtree2(TTree* events, MyMapNestEvent & e){
+
+  events->SetBranchStatus("*",0); //disable all
+
+  events->SetBranchStatus("iClusterNum2", 1);
+  events->SetBranchAddress("iClusterNum2", &e.iClusterNum2);
+
+  events->SetBranchStatus("S2X_cm", 1);
+  events->SetBranchAddress("S2X_cm", &e.S2X_cm);
+
+  events->SetBranchStatus("S2Y_cm", 1);
+  events->SetBranchAddress("S2Y_cm", &e.S2Y_cm);
+
+  events->SetBranchStatus("Drift_us", 1);
+  events->SetBranchAddress("Drift_us", &e.Drift_us);
+
+  events->SetBranchStatus("S1_raw", 1);
+  events->SetBranchAddress("S1_raw", &e.S1_raw);
+
+  events->SetBranchStatus("S1c", 1);
+  events->SetBranchAddress("S1c", &e.S1c);
+
+  events->SetBranchStatus("S2_raw", 1);
+  events->SetBranchAddress("S2_raw", &e.S2_raw);
+
+  events->SetBranchStatus("S2c", 1);
+  events->SetBranchAddress("S2c", &e.S2c);
+
+  events->SetBranchStatus("s1_raw", 1);
+  events->SetBranchAddress("s1_raw", &e.s1_raw);
+
+  events->SetBranchStatus("s1c", 1);
+  events->SetBranchAddress("s1c", &e.s1c);
+
+  events->SetBranchStatus("s2_raw", 1);
+  events->SetBranchAddress("s2_raw", &e.s2_raw);
+
+  events->SetBranchStatus("s2c", 1);
+  events->SetBranchAddress("s2c", &e.s2c);
+}
 
 
 void Cluster(MySimEvent & e, MyClusterEvent & cl){
@@ -366,19 +438,6 @@ void Cluster(MySimEvent & e, MyClusterEvent & cl){
   cl.iClusterNum=iRecordSize2;
 }
 
-//map cluster to s2x, s2y, drift time.
-void Map(MyClusterEvent & cl, FieldMap m) {
-   for (int j=0; j< cl.iClusterNum; j++){
-            m.SetCurrentPoint(cl.fPositionX_cm[j],cl.fPositionX_cm[j],cl.fPositionX_cm[j]);
-            double params[4];
-            m.InterpolateTrilinear(params); // params = {S2x, S2y, dt, E}
-            cl.S2X_cm[j]    = params[0]; // cm
-            cl.S2Y_cm[j]     = params[1]; // cm
-            cl.Drift_us[j]    = params[2]; // us
-   }
-}//Map(float dat_x, float dat_y, float dat_z, int timeBin = 1)
-
-
 
 //------------------------------------------------------------------------------
 // Main event loop is contained here.
@@ -400,6 +459,9 @@ void eventLoop(TChain* events, TTree* newtree){
 // We loop over all these entries and keep those with the enrgy below 100 keV.
   int numEntries = events->GetEntries();
   for(int i = 0; i < numEntries; i++) {
+    if (i%50000==0){
+      std::cout << "Working on eventLoop, event"<<" "<<i<<" ."<<std::endl;
+    }
     events->GetEntry(i);
   //    if(fTotEDep < 100.) 
     if(1) {
@@ -436,7 +498,7 @@ void eventLoop(TChain* events, TTree* newtree){
       if ((e.iRecordSize)>0){
         cl.posZ = ZMinAboveCat;
         for (int j = 0; j < e.iRecordSize; j++) {
-          if((e.iParticleID[j] == 22 || e.iParticleID[j] == 11 || e.iParticleID[j] == -11)){
+          if((e.iParticleID[j] == 22 || e.iParticleID[j] == 11 || e.iParticleID[j] == -11) && (e.fPositionZ_cm[j] > 5.6 && e.fPositionZ_cm[j] < 53.92 )){
             cl.posX +=  e.fPositionX_cm[j];
             cl.posY +=  e.fPositionY_cm[j];
           }
@@ -452,30 +514,6 @@ void eventLoop(TChain* events, TTree* newtree){
 }//eventLoop(TChain* events, TTree* newtree)
 
 
-void eventLoop2(TTree* newtree, TTree* newtree2, int timeBin){
-//a newtree2 to recorde mapped and nested results. 
-  int ii=0;
-//define field map;
-  TString fieldMapName = timeBinDef(timeBin);
-  TString TimeBinStr=TString::Format("%d",timeBin);
-  char* env_p = std::getenv("BKSimTools");
-  fieldMapName = TString::Format("%s/BkgSimulationTools/Run4FieldMaps/%s", env_p,fieldMapName.Data());
-  // Declare a FieldMap object that reads in the desired Lucie field map
-  FieldMap m(fieldMapName.Data());
-
-  MyClusterEvent cl1;
-//  MyClusterEvent cl2;
-
-  load_newtree(newtree, cl1);
-  set_newtree(newtree2, cl1);
-
-  int numEntries = newtree->GetEntries();
-  for(int i = 0; i < numEntries; i++) {
-    newtree->GetEntry(i);
-    Map(cl1, m); //time bin mapping
-    newtree2->Fill();
-  }
-}
 /*
 //new root variables for energy above and below cathode.
   TTree* newtree = new TTree("newtree", "newtree");
@@ -565,7 +603,7 @@ void eventLoop2(TTree* newtree, TTree* newtree2, int timeBin){
 //////////////////////////////////////////
 ////////////////////////////////////Main Function//////////////////////////////////////////
 
-int WeiLookForGammaX(TString fName, TString fOutName1, TString fOutName2, TString fOutName3, TString fOutName4) {
+int WeiLookForGammaX(TString fName, TString fOutName1, TString fOutName2, TString fOutName3) {
 
 // This root script pares down the output of the energy deposition only sims so that the optical sims don't have to run as many unneccessary simulations.
 // fName: File name for a txt that contains the directory of the root results for this simulation.
@@ -599,21 +637,23 @@ int WeiLookForGammaX(TString fName, TString fOutName1, TString fOutName2, TStrin
   eventLoop( chain, newtree);
   outfile->cd();
   newtree->Write();
-  outfile->Close();
-  delete chain; 
+  outfile->Close(); 
+  delete chain; //  chain->Delete();
   std::cout << "Done write newtree!"<<" "<<clock->RealTime()<<" s."<<std::endl;
 
-  TFile* outfile2 = new TFile(fOutName4.Data(), "recreate");
-  TTree* newtree2 = new TTree("tree","LUXSim Cluster result.");
-  eventLoop2( newtree, newtree2, 1);
-  outfile2->cd();
-  newtree2->Write();
-  outfile2->Close();
+
+//  TFile* outfile2 = new TFile(fOutName4.Data(), "recreate");
+//  TTree* newtree2 = new TTree("tree2","LUXSim Cluster result.");
+//  eventLoop2( newtree, newtree2, 1);
+//  outfile2->cd();
+//  newtree2->Write();
+//  outfile2->Close();
+  
   std::cout << "Done write newtree2!"<<" "<<clock->RealTime()<<" s."<<std::endl;
 
   std::cout << "Done!"<<" "<<clock->RealTime()<<" s."<<std::endl;
   
-  delete newtree;
+//  newtree->Delete();
 //  delete clock;
   return 1;
 
@@ -622,5 +662,5 @@ int WeiLookForGammaX(TString fName, TString fOutName1, TString fOutName2, TStrin
 
   
 
-}//WeiLookForGammaX(TString fName, TString fOutName1, TString fOutName2)
+}//WeiLookForGammaX
 
