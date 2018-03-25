@@ -41,6 +41,10 @@ HOW TO RUN IT
 
 # 8) wait until all jobs are finished.
 
+# 5')
+  //ls ../XENON_Kr85/R4Bkg_XENON_Kr85_100000* >txt.txt 
+  //root -b -q -l "./WeiLookForGammaX.C+(\"./txt.txt\", \"test1.root\", \"test2.root\", \"test3.root\",\"test4.root\")"
+
 
 
  

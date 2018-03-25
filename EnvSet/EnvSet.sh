@@ -31,6 +31,12 @@ export SIMDIR="/nfs/farm/g/superb/u01/lz/wxj/background/LUXR4Background100/"
 #export BKSimOutput="/nfs/farm/g/superb/u01/lz/wxj/background/"
 export BKSimOutput="/nfs/farm/g/superb/u01/lz/wxj/LUX_BKSim"
 
+# where the BkgSimulationTool/ folder is locate. 
+# in this case, it should be /my-path-to/LUX_BKSim
+export BKSimTools="/nfs/farm/g/superb/u01/lz/wxj/LUX_BKSim"
+
 # where the sim output is going to be stored. 
 export BKSimOutputResult="/nfs/farm/g/superb/u01/lz/wxj/background/LUXR4Background100_newnewnew/"
+
+
 

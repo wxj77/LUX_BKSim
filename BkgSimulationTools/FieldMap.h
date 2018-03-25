@@ -88,7 +88,7 @@ public:
 //***********************************************//
 void FieldMap::LoadFieldMap(const char *map_fname) {
    // Open up the field map text file
-   cout << "Using field map: " << map_fname << endl;
+//   cout << "Using field map: " << map_fname << endl;
    ifstream infile(map_fname);
    // Read in header row (don't need it)
    char buffer[1000];
