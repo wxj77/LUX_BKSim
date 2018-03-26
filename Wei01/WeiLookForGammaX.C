@@ -220,7 +220,7 @@ void set_newtree(TTree* events, MyClusterEvent & e){
 }//set_newtree()
 
 void load_newtree(TTree* events, MyClusterEvent & e){
-  events->SetBranchStatus("*",0); //disable all
+//  events->SetBranchStatus("*",0); //disable all
 
   events->SetBranchStatus("iClusterNum", 1);
   events->SetBranchAddress("iClusterNum", &e.iClusterNum);
@@ -303,7 +303,7 @@ void set_newtree2(TTree* events, MyMapNestEvent & e){
 
 void load_newtree2(TTree* events, MyMapNestEvent & e){
 
-  events->SetBranchStatus("*",0); //disable all
+//  events->SetBranchStatus("*",0); //disable all
 
   events->SetBranchStatus("iClusterNum2", 1);
   events->SetBranchAddress("iClusterNum2", &e.iClusterNum2);

@@ -24,11 +24,11 @@
 //custom header
 #include "../BkgSimulationTools/FieldMap.h"
 #include "../BkgSimulationTools/modelBinDef.h"
-#include "WeiLookForGammaX.C"
+//#include "WeiLookForGammaX.C"
 #include "MapNest.C"
-#include "/nfs/farm/g/superb/u01/lz/wxj/LibNEST/libNEST/NEST.h"
-#include "/nfs/farm/g/superb/u01/lz/wxj/LibNEST/libNEST/NEST.cxx"
-
+//#include "/nfs/farm/g/superb/u01/lz/wxj/LibNEST/libNEST/NEST.h"
+//#include "/nfs/farm/g/superb/u01/lz/wxj/LibNEST/libNEST/NEST.cxx"
+int NestResult(TString fOutName3, TString fOutName4, TString outputFile, int timeBin);
 
 int NestResult(TString fOutName3, TString fOutName4, TString outputFile, int timeBin){
 	TFile* out_file = new TFile( outputFile.Data(), "RECREATE");
@@ -62,6 +62,7 @@ int NestResult(TString fOutName3, TString fOutName4, TString outputFile, int tim
 
 	float br_Fr = -999.; out_tree->Branch("Fr", &br_Fr, "Fr/F");
 	float br_Efield = -999.; out_tree->Branch("Efield", &br_Efield, "Efield/F");
+	float br_Energy2 = -999.; out_tree->Branch("Energy2", &br_Energy2, "Energy2/F");
 
 // fOutName3: A File that contain the clustered, mapped, nested result for the simulation results.
 // fOutName4: A File that contain the clustered, mapped, nested result for the simulation results, for different timeBin.
@@ -84,17 +85,20 @@ int NestResult(TString fOutName3, TString fOutName4, TString outputFile, int tim
 
   load_newtree(newtree, cl);
 
-  load_newtree2(newtree2, mn);
+  load_newtree2(newtree, mn);
 ///////////////
 // main event loop.
+	newtree->Print();
 
   int numEntries = newtree->GetEntries();//2000;//
   for(int i = 0; i < numEntries; i++) {
-    if (i%5000==0){
+//	cout<< " single scatters saved" <<cl.Energy2 <<endl; 
+    if (i%50000==0){
       std::cout << "Working on eventLoop, event"<<" "<<i<<" ."<<std::endl;
     }
     newtree->GetEntry(i);
-    if ((cl.deltaZ > 0) && (cl.deltaZ<.65) ){ //single scatter above cathode.
+    if ((cl.deltaZ > -.5) && (cl.deltaZ<.65) ){ //single scatter above cathode.
+       
 	br_iEvtN = i; 
 	br_iParticleID = cl.iParticleID[0]; //Wei, need to change this 
 	//real space positions
@@ -104,11 +108,11 @@ int NestResult(TString fOutName3, TString fOutName4, TString outputFile, int tim
 	br_z_cm = cl.posZ; 
 	br_phi = atan2(cl.posY, cl.posX); 
 	//S2 space positions
-	br_x_s2_cm = mn.S2X_cm; 
-	br_y_s2_cm = mn.S2Y_cm; 
-	br_r_s2_cm = sqrt(mn.S2X_cm*mn.S2X_cm+mn.S2Y_cm*mn.S2Y_cm); 
-	br_dt_s2 = mn.Drift_us; 
-	br_phi_s2 = atan2(mn.S2Y_cm, mn.S2X_cm); 
+	br_x_s2_cm = mn.S2X_cm[0]; 
+	br_y_s2_cm = mn.S2Y_cm[0]; 
+	br_r_s2_cm = sqrt(mn.S2X_cm[0]*mn.S2X_cm[0]+mn.S2Y_cm[0]*mn.S2Y_cm[0]); 
+	br_dt_s2 = mn.Drift_us[0]; 
+	br_phi_s2 = atan2(mn.S2Y_cm[0], mn.S2X_cm[0]); 
 	//Event energy
 	br_energy_keV = cl.fTotEDep; 
 	//S1 info
@@ -121,15 +125,21 @@ int NestResult(TString fOutName3, TString fOutName4, TString outputFile, int tim
 
 	br_Fr = -999.; //Wei, need to change this 
 	br_Efield = -999.; //Wei, need to change this 
+
+	br_Energy2=cl.Energy2;
+        out_tree->Fill();
     }
   }
 
 
 	out_file->cd();
+	
+	cout<< out_tree->GetEntries() << " single scatters (total)saved"<<endl;
+        cout<< out_tree->GetEntries("Energy2>1.e-4") << " single scatters (with energy deposition below cathode) saved"<<endl;
+
 	out_tree->Write();
 	out_file->Close();
-	
-	cout<< counter << " single scatters saved"<<endl;
+
 	cout<<"Finished!"<<endl;
  return 1; 
 }
