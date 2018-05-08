@@ -8,8 +8,8 @@ path=$BKSimOutput
 #cd $path/Run4Background/Tools_100X_100keVee
 cd $path/BackgroundSim/ 
 
-source  MS1Loop_R.sh 4820 PMTT K40
-source  MS1Loop_R.sh 184 PMTT Co60
+source MS1Loop_R.sh 4820 PMTT K40
+source MS1Loop_R.sh 184 PMTT Co60
 source MS1Loop_R.sh 7040 PMTT Ra226
 source MS1Loop_R.sh 612 PMTT Th232E
 source MS1Loop_R.sh 1632 PMTT Th232L

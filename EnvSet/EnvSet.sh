@@ -36,7 +36,7 @@ export BKSimOutput="/nfs/farm/g/superb/u01/lz/wxj/LUX_BKSim/"
 export BKSimTools="/nfs/farm/g/superb/u01/lz/wxj/LUX_BKSim/"
 
 # where the sim output is going to be stored. 
-export BKSimOutputResult="/nfs/farm/g/superb/u01/lz/wxj/background/LUXR4Background100_newnewnew/"
+export BKSimOutputResult="/nfs/farm/g/superb/u01/lz/wxj/background/LUXR4Background100_newtrim/"
 
 if [ "${HOSTNAME:0:4}" = "pdsf" ];then
 	module unload ROOT

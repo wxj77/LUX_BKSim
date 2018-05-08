@@ -22,12 +22,16 @@ MSLOCATION=$dirpath
 #LUXSIMLOCATION=$path/LUXSim
 ROOTREADERLOCATION=${LUXSIMLOCATION}/tools
 OUTPUTFOLDER=${BKSimOutputResult}
+OUTPUTFOLDERTEMP=/scratch/wxj/
 DATE=10072017
+
+mkdir -p $OUTPUTFOLDER/$2/$3/
+mkdir -p $OUTPUTFOLDERTEMP/$2/$3/
 
 #module load Geant4/4.9.4.p04
 #:module load ROOT/5.34.10
 cd $MSLOCATION
-source $MSLOCATION/EDepMacGenerator_R.sh $1 $2 $3 $MACROLOCATION $OUTPUTFOLDER $DATE
+source $MSLOCATION/EDepMacGenerator_R.sh $1 $2 $3 $MACROLOCATION $OUTPUTFOLDERTEMP $DATE
 cd $LUXSIMLOCATION
 #echo ./LUXSimExecutable $MACROLOCATION/R4Bkg_$2_$3_$1.mac
 
@@ -37,13 +41,19 @@ echo "start LUXSIM"
 echo "success LUXSIM"
 #source $ROOTLOCATION/thisroot.sh
 #echo ${ROOTREADERLOCATION}/LUXRootReader $OUTPUTFOLDER/$2/$3/R4Bkg_$2_$3_$1.bin
-${ROOTREADERLOCATION}/LUXRootReader $OUTPUTFOLDER/$2/$3/R4Bkg_$2_$3_$1.bin
+${ROOTREADERLOCATION}/LUXRootReader $OUTPUTFOLDERTEMP/$2/$3/R4Bkg_$2_$3_$1.bin
 echo "success ROOTreader"
 
-cd $OUTPUTFOLDER/$2/$3/
+
+cd $OUTPUTFOLDERTEMP/$2/$3/
 #root -l -q -b "$MSLOCATION/MakeEventsFile.c(\"R4Bkg_$2_$3_$1.root\",\"R4Bkg_$2_$3_$1\")"
-root -l -q -b "$MSLOCATION/MakeEventsFile_WS.c(\"R4Bkg_$2_$3_$1.root\",\"R4Bkg_$2_$3_$1\")"
-#rm -f $OUTPUTFOLDER/$2/$3/R4Bkg_$2_$3_$1.root ##Wei, keep results for .root to check the correctness of simulations.
-rm -f $OUTPUTFOLDER/$2/$3/R4Bkg_$2_$3_$1.bin
+#root -l -q -b "$MSLOCATION/MakeEventsFile_WS.c(\"R4Bkg_$2_$3_$1.root\",\"R4Bkg_$2_$3_$1\")"
+root -l -q -b "${MSLOCATION}/MakeEventsFile_WS_new.c(\"R4Bkg_$2_$3_$1.root\",\"R4Bkg_$2_$3_$1\")"
+root -q -l -b "${MSLOCATION}/trimtree.C(\"R4Bkg_$2_$3_$1.root\", \"R4BkT_$2_$3_$1.root\")"
+cp R4Bkg_$2_$3_$1*.data $OUTPUTFOLDER/$2/$3/
+mkdir -p $OUTPUTFOLDER/$2/$3/rootfiles/
+cp R4BkT_$2_$3_$1.root $OUTPUTFOLDER/$2/$3/
+rm -f $OUTPUTFOLDERTEMP/$2/$3/R4Bkg_$2_$3_$1.root ##Wei, keep results for .root to check the correctness of simulations.
+rm -f $OUTPUTFOLDERTEMP/$2/$3/R4Bkg_$2_$3_$1.bin
 
 exit

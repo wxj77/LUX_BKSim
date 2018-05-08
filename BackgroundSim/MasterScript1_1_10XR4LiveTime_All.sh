@@ -8,9 +8,11 @@ path=$BKSimOutput
 #cd $path/Run4Background/Tools_100X_100keVee
 cd $path/BackgroundSim/
 
+#simulation finished if commented
+
 #source  MS1Loop_R.sh 4820 PMTT K40
 #source  MS1Loop_R.sh 184 PMTT Co60
-#source MS1Loop_R.sh 7040 PMTT Ra226
+#source MS1Loop_R.sh 1002 PMTT Ra226 #source MS1Loop_R.sh 7040 PMTT Ra226
 #source MS1Loop_R.sh 612 PMTT Th232E
 #source MS1Loop_R.sh 1632 PMTT Th232L
 #source MS1Loop_R.sh 4820 PMTB K40
@@ -38,42 +40,42 @@ cd $path/BackgroundSim/
 #source MS1Loop_R.sh 1248 TOPSHIELD Th232E
 #source MS1Loop_R.sh 3328 TOPSHIELD Th232L
 
-#source MS1Loop_R.sh 14076 PMT Ra226
-#source MS1Loop_R.sh 1152 HDPE Ra226
-#source MS1Loop_R.sh 504 PTFE Ra226
-#source MS1Loop_R.sh 504 REFLECTOR Ra226
-#source MS1Loop_R.sh 936 CRYOSTAT Ra226
+#source MS1Loop_R.sh 14076 PMT Ra226 ?
+source MS1Loop_R.sh 1152 HDPE Ra226
+source MS1Loop_R.sh 504 PTFE Ra226
+source MS1Loop_R.sh 504 REFLECTOR Ra226
+source MS1Loop_R.sh 936 CRYOSTAT Ra226
 source MS1Loop_R.sh 72 FIELDGRID Ra226
 source MS1Loop_R.sh 180 FIELDRING Ra226
-#source MS1Loop_R.sh 3960 PMTMOUNT Ra226
-#source MS1Loop_R.sh 6840 FCSHIELD Ra226
-#source MS1Loop_R.sh 2844 TOPSHIELD Ra226
-#source MS1Loop_R.sh 9636 PMT K40
-#source MS1Loop_R.sh 436 CRYOSTAT K40
-##source MS1Loop_R.sh 4 FIELDGRID K40
-#source MS1Loop_R.sh 380 PMT Co60
-##source MS1Loop_R.sh 8 FIELDGRID Co60
-##source MS1Loop_R.sh 12 FIELDRING Co60
-#source MS1Loop_R.sh 340 PMTMOUNT Co60
-#source MS1Loop_R.sh 588 FCSHIELD Co60
-#source  MS1Loop_R.sh 244 TOPSHIELD Co60
-#source  MS1Loop_R.sh 1296 CRYOSTAT Sc46
+source MS1Loop_R.sh 3960 PMTMOUNT Ra226
+source MS1Loop_R.sh 6840 FCSHIELD Ra226
+source MS1Loop_R.sh 2844 TOPSHIELD Ra226
+#source MS1Loop_R.sh 9636 PMT K40 ?
+source MS1Loop_R.sh 436 CRYOSTAT K40
+source MS1Loop_R.sh 4 FIELDGRID K40
+source MS1Loop_R.sh 380 PMT Co60
+source MS1Loop_R.sh 8 FIELDGRID Co60
+source MS1Loop_R.sh 12 FIELDRING Co60
+source MS1Loop_R.sh 340 PMTMOUNT Co60
+source MS1Loop_R.sh 588 FCSHIELD Co60
+source  MS1Loop_R.sh 244 TOPSHIELD Co60
+source  MS1Loop_R.sh 1296 CRYOSTAT Sc46
 source  MS1Loop_R.sh 20 XENON Rn222
 source  MS1Loop_R.sh 4 XENON Rn220
-##source  MS1Loop_R.sh 204 XENON Xe127
+source  MS1Loop_R.sh 204 XENON Xe127
 source  MS1Loop_R.sh 4 XENON Kr85
 
-#source  MS1Loop_R.sh 120 MYLAR Th232E
-#source  MS1Loop_R.sh 320 MYLAR Th232L
+source  MS1Loop_R.sh 120 MYLAR Th232E
+source  MS1Loop_R.sh 320 MYLAR Th232L
 
-#source MS1Loop_R.sh 1728 MYLAR Ra226
-#source MS1Loop_R.sh 1666 MYLAR K40
+source MS1Loop_R.sh 1728 MYLAR Ra226
+source MS1Loop_R.sh 1666 MYLAR K40
 
-#source MS1Loop_R.sh 1264 THERMALSHIELD Th232E
-#source MS1Loop_R.sh 3104 THERMALSHIELD Th232L
+source MS1Loop_R.sh 1264 THERMALSHIELD Th232E
+source MS1Loop_R.sh 3104 THERMALSHIELD Th232L
 
-#source MS1Loop_R.sh 8280 THERMALSHIELD Ra226
-#source MS1Loop_R.sh 748 THERMALSHIELD K40
+source MS1Loop_R.sh 8280 THERMALSHIELD Ra226
+source MS1Loop_R.sh 748 THERMALSHIELD K40
 
 source  MS1Loop_R.sh 720 FCSHIELDPLANE Co60
 source  MS1Loop_R.sh 160 FCSHIELDPLANE Pb212

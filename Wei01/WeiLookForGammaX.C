@@ -623,13 +623,13 @@ int WeiLookForGammaX(TString fName, TString fOutName1, TString fOutName2, TStrin
   load_chain(txtFileList, chain2);
   SaveChain(fOutName2, chain2);
   delete chain2;
-  std::cout << "Done write header!"<<" "<<clock->RealTime()<<" s."<<std::endl;
+//  std::cout << "Done write header!"<<" "<<clock->RealTime()<<" s."<<std::endl;
 
 // write tree info, has all simulation results/
   TChain *chain = new TChain("tree");
   load_chain(txtFileList, chain);
   SaveChain(fOutName1, chain);
-  std::cout << "Done write tree!"<<" "<<clock->RealTime()<<" s."<<std::endl;
+//  std::cout << "Done write tree!"<<" "<<clock->RealTime()<<" s."<<std::endl;
 
 // write newtree info, has output for cluster events.
   TFile* outfile = new TFile(fOutName3.Data(), "recreate");
@@ -639,7 +639,7 @@ int WeiLookForGammaX(TString fName, TString fOutName1, TString fOutName2, TStrin
   newtree->Write();
   outfile->Close(); 
   delete chain; //  chain->Delete();
-  std::cout << "Done write newtree!"<<" "<<clock->RealTime()<<" s."<<std::endl;
+//  std::cout << "Done write newtree!"<<" "<<clock->RealTime()<<" s."<<std::endl;
 
 
 //  TFile* outfile2 = new TFile(fOutName4.Data(), "recreate");
@@ -649,7 +649,7 @@ int WeiLookForGammaX(TString fName, TString fOutName1, TString fOutName2, TStrin
 //  newtree2->Write();
 //  outfile2->Close();
   
-  std::cout << "Done write newtree2!"<<" "<<clock->RealTime()<<" s."<<std::endl;
+//  std::cout << "Done write newtree2!"<<" "<<clock->RealTime()<<" s."<<std::endl;
 
   std::cout << "Done!"<<" "<<clock->RealTime()<<" s."<<std::endl;
   
