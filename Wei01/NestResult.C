@@ -1,3 +1,5 @@
+#ifndef NESTRESULT_C
+#define NESTRESULT_C 1
 
 //c lib
 #include <iostream>
@@ -143,3 +145,5 @@ int NestResult(TString fOutName3, TString fOutName4, TString outputFile, int tim
 	cout<<"Finished!"<<endl;
  return 1; 
 }
+
+#endif

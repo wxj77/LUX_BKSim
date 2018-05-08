@@ -1,3 +1,5 @@
+#ifndef MAPNEST_C
+#define MAPNEST_C 1
 //root -b -q -l "./Wei01/MapNest.C+(\"test3.root\", \"test4\",1)"
 
 //c lib
@@ -212,3 +214,6 @@ int MapNest(TString fOutName3, TString fOutName4, int timeBin) {
   
 
 }//WeiLookForGammaX
+
+
+#endif
