@@ -3,8 +3,8 @@
 # This code is for set up environment variables in SLAC cluster. If you want to use your code in other cluster, you may need to change the location of these variables.
 
 #root
-source /afs/slac.stanford.edu/u/rd/wto/Downloads/root/bin/thisroot.sh
-#source /afs/slac.stanford.edu/package/cernroot/53426/bin/thisroot.sh
+#source /afs/slac.stanford.edu/u/rd/wto/Downloads/root/bin/thisroot.sh
+source /afs/slac.stanford.edu/package/cernroot/53410/bin/thisroot.sh
 
 #nest
 #nest source code: git@github.com:luxdarkmatter/LibNEST.git

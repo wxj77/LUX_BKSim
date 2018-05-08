@@ -8,6 +8,21 @@ path=$BKSimOutput
 #cd $path/Run4Background/Tools_100X_100keVee
 cd $path/BackgroundSim/ 
 
-source  MS1Loop_R.sh 20 XENON Rn222
-source  MS1Loop_R.sh 4 XENON Rn220
+source MS1Loop_R.sh 12 FIELDGRID Th232E
+source MS1Loop_R.sh 32 FIELDGRID Th232L
+source MS1Loop_R.sh 84 FIELDRING Th232E
+source MS1Loop_R.sh 224 FIELDRING Th232L
+
+source MS1Loop_R.sh 8 FIELDGRID Co60
+source MS1Loop_R.sh 12 FIELDRING Co60
+
+source MS1Loop_R.sh 72 FIELDGRID Ra226
+source MS1Loop_R.sh 180 FIELDRING Ra226
+
+source MS1Loop_R.sh 4 FIELDGRID K40
+
+
+source  MS1Loop_R.sh 720 FCSHIELDPLANE Co60
+source MS1Loop_R.sh 3000 FCSHIELD Th232E
+source MS1Loop_R.sh 8000 FCSHIELD Th232L
 

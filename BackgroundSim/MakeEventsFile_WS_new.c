@@ -5,7 +5,7 @@
 #include <iostream>
 #include <cstdio>
 
-void MakeEventsFile_WS(TString fName, TString fOutName) {
+void MakeEventsFile_WS_new(TString fName, TString fOutName) {
 
 // This root script pares down the output of the energy deposition only sims so that the optical sims don't have to run as many unneccessary simulations.
   printf("start make event.");
