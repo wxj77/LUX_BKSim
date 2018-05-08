@@ -56,6 +56,7 @@ echo ${OUTPUTFOLDERFIN}/$2/$3/rootfiles/
 mkdir -p ${OUTPUTFOLDERFIN}/$2/$3/rootfiles/
 cp R4BkT_$2_$3_$1.root ${OUTPUTFOLDERFIN}/$2/$3/rootfiles/
 rm R4Bkg_$2_$3_$1*.data
+rm R4BkT_$2_$3_$1.root
 rm -f ${TEMPFOLDER}/$2/$3/R4Bkg_$2_$3_$1.root ##Wei, keep results for .root to check the correctness of simulations.
 rm -f ${TEMPFOLDER}/$2/$3/R4Bkg_$2_$3_$1.bin
 
