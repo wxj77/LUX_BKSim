@@ -35,14 +35,14 @@ public :
    Int_t           iRecordSize;
    Int_t           iEvtN;
    Int_t           iV_name;
-   Char_t          cVolumeName[12];
+//   Char_t          cVolumeName[12];
    Int_t           iStepNum[117];   //[iRecordSize]
    Int_t           iParticleID[117];   //[iRecordSize]
-   Char_t          cParticleName[362];
+//   Char_t          cParticleName[362];
    Int_t           iTrackID[117];   //[iRecordSize]
    Int_t           iParentID[117];   //[iRecordSize]
-   Char_t          cCreatorProcess[1470];
-   Char_t          cStepProcess[528];
+//   Char_t          cCreatorProcess[1470];
+//   Char_t          cStepProcess[528];
    Double_t        fKEnergy_keV[117];   //[iRecordSize]
    Double_t        fOptPhoWaveLength_nm[117];   //[iRecordSize]
    Double_t        fDirectionX[117];   //[iRecordSize]
@@ -71,14 +71,14 @@ public :
    TBranch        *b_iRecordSize;   //!
    TBranch        *b_EvtN;   //!
    TBranch        *b_V_name;   //!
-   TBranch        *b_cVolumeName;   //!
+//   TBranch        *b_cVolumeName;   //!
    TBranch        *b_iStepNum;   //!
    TBranch        *b_iParticleID;   //!
-   TBranch        *b_cParticleName;   //!
+ //  TBranch        *b_cParticleName;   //!
    TBranch        *b_iTrackID;   //!
    TBranch        *b_iParentID;   //!
-   TBranch        *b_cCreatorProcess;   //!
-   TBranch        *b_cStepProcess;   //!
+ //  TBranch        *b_cCreatorProcess;   //!
+ //  TBranch        *b_cStepProcess;   //!
    TBranch        *b_fKEnergy_keV;   //!
    TBranch        *b_fOptPhoWaveLength_nm;   //!
    TBranch        *b_fDirectionX;   //!
@@ -176,14 +176,14 @@ void tree::Init(TTree *tree)
    fChain->SetBranchAddress("iRecordSize", &iRecordSize, &b_iRecordSize);
    fChain->SetBranchAddress("iEvtN", &iEvtN, &b_EvtN);
    fChain->SetBranchAddress("iV_name", &iV_name, &b_V_name);
-   fChain->SetBranchAddress("cVolumeName", cVolumeName, &b_cVolumeName);
+//   fChain->SetBranchAddress("cVolumeName", cVolumeName, &b_cVolumeName);
    fChain->SetBranchAddress("iStepNum", iStepNum, &b_iStepNum);
    fChain->SetBranchAddress("iParticleID", iParticleID, &b_iParticleID);
-   fChain->SetBranchAddress("cParticleName", cParticleName, &b_cParticleName);
+//   fChain->SetBranchAddress("cParticleName", cParticleName, &b_cParticleName);
    fChain->SetBranchAddress("iTrackID", iTrackID, &b_iTrackID);
    fChain->SetBranchAddress("iParentID", iParentID, &b_iParentID);
-   fChain->SetBranchAddress("cCreatorProcess", cCreatorProcess, &b_cCreatorProcess);
-   fChain->SetBranchAddress("cStepProcess", cStepProcess, &b_cStepProcess);
+//   fChain->SetBranchAddress("cCreatorProcess", cCreatorProcess, &b_cCreatorProcess);
+//   fChain->SetBranchAddress("cStepProcess", cStepProcess, &b_cStepProcess);
    fChain->SetBranchAddress("fKEnergy_keV", fKEnergy_keV, &b_fKEnergy_keV);
    fChain->SetBranchAddress("fOptPhoWaveLength_nm", fOptPhoWaveLength_nm, &b_fOptPhoWaveLength_nm);
    fChain->SetBranchAddress("fDirectionX", fDirectionX, &b_fDirectionX);

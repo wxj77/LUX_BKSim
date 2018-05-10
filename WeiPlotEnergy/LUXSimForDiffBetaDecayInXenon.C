@@ -70,7 +70,7 @@ void load_chain(TString txtFileList, TChain* chain)
 }
 
 
-bool inCenter (tree & e, double rmin=0, double zmin=25, double rmax=0, double zmax){return 1;}
+bool inCenter (tree & e, double rmin=0, double zmin=25, double rmax=0, double zmax=50.){return 1;}
 
 int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOutName=""){
   int WhichStyle =1;
@@ -209,6 +209,9 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
   // no supressed zeroes!
   lzStyle->SetHistMinimumZero(kTRUE);
   
+  
+  gROOT->SetStyle("lzStyle");
+  gROOT->ForceStyle(kTRUE);
 
 //---Finish setting plot style
 //---start do calculation of energy spectrum.
@@ -237,7 +240,7 @@ TCut r2="fPositionX_cm * fPositionX_cm + fPositionY_cm * fPositionY_cm<25*25 && 
 //http://www.pd.infn.it/~conti/images/LXe/LXEdensity.jpg
 
 //simulate in r=25cm dz=[28-28, 28+28 ]cm; source volume = 3.167 e5 cm^3
-double rho = 2.88;
+double rho = 2.88e-3; //kg/cm^3
 double pi=3.1415927;
 double massTot = pi*25*25*28*2*rho;
 double mass0 = pi*18*18*16*2*rho;
@@ -264,9 +267,9 @@ double mass2 = pi*23*23*(48.72)*rho - pi*20.5*20.5*(48.6-8.54)*rho;
 
   std::cout<<"success load trees. "<<std::endl;
 
-  TH1F* h0              = new TH1F("he_center", ";Energy [keV]; reduced rate [mBq^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* h1               = new TH1F("he_fd", ";Energy [keV]; reduced rate [mBq^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* h2               = new TH1F("he_skin", ";Energy [keV]; reduced rate [mBq^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* h0              = new TH1F("he_center", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* h1               = new TH1F("he_fd", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* h2               = new TH1F("he_skin", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
 
 double numOfSim= double (ttree->GetEntries());
 for (int ii=0; ii<numOfSim; ii++){
@@ -282,16 +285,29 @@ for (int ii=0; ii<numOfSim; ii++){
 
 double dayLength=24*60*60; //second
 double daymBq = dayLength *1.e-3;
-h0->SetTitle(";Energy [keV]; reduced rate [mBq^{-1} kg^{-1} day^{-1} keV^{-1}]");
-h0->Scale(massTot/mass0/numOfSim*daymBq);
+//double mDRU = 1.e-3;
+double fraction; //since the source is confined in xenon space so numOfSims are not uniformly distribute in massTot
+TCut fz1="fPrimaryParPosZ_mm< (28+16)*10 && fPrimaryParPosZ_mm > (28-16)*10";
+TCut fr1="fPrimaryParPosX_mm * fPrimaryParPosX_mm + fPrimaryParPosY_mm * fPrimaryParPosY_mm<100*100"; //cm
+double fmass1 = pi*10.0*10.0*16*2*rho;
+
+TCut fz0="fPrimaryParPosZ_mm< (28+20)*10 && fPrimaryParPosZ_mm > (28-16)*10";
+TCut fr0="fPrimaryParPosX_mm * fPrimaryParPosX_mm + fPrimaryParPosY_mm * fPrimaryParPosY_mm<50*50"; //cm
+double fmass0 = pi*5.0*5*(16+20)*rho;
+double k=ttree->GetEntries(fz0 && fr0)/fmass0;
+
+fraction = 1./(ttree->GetEntries(fr1&&fz1)/fmass1)*(numOfSim/massTot);
+
+h0->SetTitle(";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
+h0->Scale(massTot/mass0/numOfSim*fraction*daymBq);
 h0->SetName("center");
 h0->SetLineColor(kBlue);
-h1->SetTitle(";Energy [keV]; reduced rate [mBq^{-1} kg^{-1} day^{-1} keV^{-1}]");
-h1->Scale(massTot/mass1/numOfSim*daymBq);
+h1->SetTitle(";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
+h1->Scale(massTot/mass1/numOfSim*fraction*daymBq);
 h1->SetName("activeVolume");
 h1->SetLineColor(kRed);
-h2->SetTitle(";Energy [keV]; reduced rate [mBq^{-1} kg^{-1} day^{-1} keV^{-1}]");
-h2->Scale(massTot/mass2/numOfSim*daymBq);
+h2->SetTitle(";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
+h2->Scale(massTot/mass2/numOfSim*fraction*daymBq);
 h2->SetName("skin");
 h2->SetLineColor(kBlack);
 
@@ -318,7 +334,7 @@ f1->SetLineColor(kRed);
 //-----start drawing
 
 
-TCanvas* c1 = new TCanvas("c1", ";Energy [keV]; reduced rate [mBq^{-1} kg^{-1} day^{-1} keV^{-1}]");
+TCanvas* c1 = new TCanvas("c1", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
 c1->Draw();
 
 double skinScale=2.; //--Wei Need to change
