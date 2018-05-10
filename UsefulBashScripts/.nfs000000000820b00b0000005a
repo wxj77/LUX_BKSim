@@ -1,0 +1,17 @@
+#!/bin/bash
+
+FolderName=$1
+NewFolderName=$2
+mkdir -p ${NewFolderName}
+
+for X in `ls ${FolderName}`; do
+	for Y in `ls ${FolderName}/${X}`; do
+		Num=`ls ${FolderName}/${X}/${Y}/*.root|wc -l`
+		if [ "${Num}" -gt 0 ]; then
+			echo $Num
+			hadd -f ${NewFolderName}/${X}_${Y}_COMB.root ${FolderName}/${X}/${Y}/*.root
+			rm ${FolderName}/${X}/${Y}/*.root
+			rm ${FolderName}/${X}/${Y}/*.bin
+		fi;
+	done
+done

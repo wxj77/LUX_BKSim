@@ -6,20 +6,15 @@
 #Values for each set correspond to more than 10X Run04 Live Time (min of 340 live days)
 path=$BKSimOutput
 #cd $path/Run4Background/Tools_100X_100keVee
-cd $path/BackgroundSim/ 
+cd $path/BackgroundSim/
 
-#source MS1Loop_R.sh 12 FIELDGRID Th232E
-#source MS1Loop_R.sh 32 FIELDGRID Th232L
-#source MS1Loop_R.sh 84 FIELDRING Th232E
-#source MS1Loop_R.sh 224 FIELDRING Th232L
-
-#source MS1Loop_R.sh 8 FIELDGRID Co60
-#source MS1Loop_R.sh 12 FIELDRING Co60
-
-#source MS1Loop_R.sh 72 FIELDGRID Ra226
-#source MS1Loop_R.sh 180 FIELDRING Ra226
-
-source MS1Loop_R.sh 4 FIELDGRID K40
-
-
-
+source  MS1Loop_R.sh 48200 PMTT K40
+source  MS1Loop_R.sh 1840 PMTT Co60
+source MS1Loop_R.sh 70400 PMTT Ra226
+source MS1Loop_R.sh 6120 PMTT Th232E
+source MS1Loop_R.sh 16320 PMTT Th232L
+source MS1Loop_R.sh 48200 PMTB K40
+source MS1Loop_R.sh 1840 PMTB Co60
+source MS1Loop_R.sh 70400 PMTB Ra226
+source MS1Loop_R.sh 6120 PMTB Th232E
+source MS1Loop_R.sh 16320 PMTB Th232L
