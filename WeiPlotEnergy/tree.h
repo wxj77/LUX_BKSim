@@ -36,23 +36,23 @@ public :
    Int_t           iEvtN;
    Int_t           iV_name;
 //   Char_t          cVolumeName[12];
-   Int_t           iStepNum[117];   //[iRecordSize]
-   Int_t           iParticleID[117];   //[iRecordSize]
+   Int_t           iStepNum[100000];   //[iRecordSize]
+   Int_t           iParticleID[100000];   //[iRecordSize]
 //   Char_t          cParticleName[362];
-   Int_t           iTrackID[117];   //[iRecordSize]
-   Int_t           iParentID[117];   //[iRecordSize]
+   Int_t           iTrackID[100000];   //[iRecordSize]
+   Int_t           iParentID[100000];   //[iRecordSize]
 //   Char_t          cCreatorProcess[1470];
 //   Char_t          cStepProcess[528];
-   Double_t        fKEnergy_keV[117];   //[iRecordSize]
-   Double_t        fOptPhoWaveLength_nm[117];   //[iRecordSize]
-   Double_t        fDirectionX[117];   //[iRecordSize]
-   Double_t        fDirectionY[117];   //[iRecordSize]
-   Double_t        fDirectionZ[117];   //[iRecordSize]
-   Double_t        fEnergyDep_keV[117];   //[iRecordSize]
-   Double_t        fPositionX_cm[117];   //[iRecordSize]
-   Double_t        fPositionY_cm[117];   //[iRecordSize]
-   Double_t        fPositionZ_cm[117];   //[iRecordSize]
-   Double_t        fStepTime[117];   //[iRecordSize]
+   Double_t        fKEnergy_keV[100000];   //[iRecordSize]
+   Double_t        fOptPhoWaveLength_nm[100000];   //[iRecordSize]
+   Double_t        fDirectionX[100000];   //[iRecordSize]
+   Double_t        fDirectionY[100000];   //[iRecordSize]
+   Double_t        fDirectionZ[100000];   //[iRecordSize]
+   Double_t        fEnergyDep_keV[100000];   //[iRecordSize]
+   Double_t        fPositionX_cm[100000];   //[iRecordSize]
+   Double_t        fPositionY_cm[100000];   //[iRecordSize]
+   Double_t        fPositionZ_cm[100000];   //[iRecordSize]
+   Double_t        fStepTime[100000];   //[iRecordSize]
    Double_t        fTotEDep;
    Int_t           iTotOptNum;
    Int_t           iTotThermElecNum;

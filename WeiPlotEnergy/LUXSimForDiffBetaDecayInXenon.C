@@ -18,8 +18,8 @@
 #include "TString.h"
 #include "TTree.h"
 #include "TChain.h"
-#include "TH1F.h"
-#include "TH2F.h"
+#include "The_fdF.h"
+#include "The_skinF.h"
 #include "TH3F.h"
 #include "TMath.h"
 #include "TCanvas.h"
@@ -70,9 +70,13 @@ void load_chain(TString txtFileList, TChain* chain)
 }
 
 
-bool inCenter (tree & e, double rmin=0, double zmin=25, double rmax=0, double zmax=50.){return 1;}
+bool inVolume (double r, double z, double rmin=0, double zmin=25, double rmax=0, double zmax=50.){
+  bool rin=( (rmin<=r) &&(r<rmax) ) ;
+  bool zin=( (zmin<=z) &&(z<zmax) ) ;
+  return (rin && zin);
+}
 
-int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOutName=""){
+int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOutName="test.root", TString fOutfigName="test"){
   int WhichStyle =1;
   TStyle *lzStyle = new TStyle("lzStyle","LZ Style");
 
@@ -213,42 +217,45 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
   gROOT->SetStyle("lzStyle");
   gROOT->ForceStyle(kTRUE);
 
-//---Finish setting plot style
-//---start do calculation of energy spectrum.
+  //---Finish setting plot style
+  //---start do calculation of energy spectrum.
 
-bool drawSkin=false;
-bool fitAct=false;
-//double skinScale;
-
-
-//X0:center; X1; active volume; X2->Skin 
-
-TCut x0="fPositionX_cm < 10 && fPositionX_cm > -10";
-TCut y0="fPositionY_cm < 10 && fPositionY_cm > -10";
-TCut z0="fPositionZ_cm < 28+16 && fPositionZ_cm > 28-16";
-TCut r0="fPositionX_cm * fPositionX_cm + fPositionY_cm * fPositionY_cm<18*18"; //cm
-// volume in r=18cm dz=16*2cm; is 3.257e4 cm^3, rho=2.88 kg/cm^3 at 170K m= 93.81 kg
-
-TCut z1="fPositionZ_cm < 48.6 && fPositionZ_cm > 8.54";
-TCut r1="fPositionX_cm * fPositionX_cm + fPositionY_cm * fPositionY_cm<20.5*20.5"; //cm 
-// volume in r=20.5cm dz=[8.54, 48.6 ]cm; is 5.289e4 cm^3, rho=2.88 kg/cm^3 at 170K m=152.3kg
-//http://www.pd.infn.it/~conti/images/LXe/LXEdensity.jpg
-
-TCut z2="fPositionZ_cm < 5.6+48.72 && fPositionZ_cm > 5.6";
-TCut r2="fPositionX_cm * fPositionX_cm + fPositionY_cm * fPositionY_cm<25*25 && fPositionX_cm * fPositionX_cm + fPositionY_cm * fPositionY_cm>20*20"; //cm 
-// volume in r=20.5cm dz=[8.54, 48.6 ]cm; is 5.289e4 cm^3, rho=2.88 kg/cm^3 at 170K m=152.3kg
-//http://www.pd.infn.it/~conti/images/LXe/LXEdensity.jpg
-
-//simulate in r=25cm dz=[28-28, 28+28 ]cm; source volume = 3.167 e5 cm^3
-double rho = 2.88e-3; //kg/cm^3
-double pi=3.1415927;
-double massTot = pi*25*25*28*2*rho;
-double mass0 = pi*18*18*16*2*rho;
-double mass1 = pi*20.5*20.5*(48.6-8.54)*rho;
-double mass2 = pi*23*23*(48.72)*rho - pi*20.5*20.5*(48.6-8.54)*rho;
+  bool drawSkin=false;
+  bool fitAct=false;
+  //double skinScale;
 
 
+  //X0:center; X1; active volume; X2->Skin 
 
+  TCut x0="fPositionX_cm < 10 && fPositionX_cm > -10";
+  TCut y0="fPositionY_cm < 10 && fPositionY_cm > -10";
+  TCut z0="fPositionZ_cm < 28+16 && fPositionZ_cm > 28-16";
+  TCut r0="fPositionX_cm * fPositionX_cm + fPositionY_cm * fPositionY_cm<18*18"; //cm
+  // volume in r=18cm dz=16*2cm; is 3.257e4 cm^3, rho=2.88 kg/cm^3 at 170K m= 93.81 kg
+
+  TCut z1="fPositionZ_cm < 48.6 && fPositionZ_cm > 8.54";
+  TCut r1="fPositionX_cm * fPositionX_cm + fPositionY_cm * fPositionY_cm<20.5*20.5"; //cm 
+  // volume in r=20.5cm dz=[8.54, 48.6 ]cm; is 5.289e4 cm^3, rho=2.88 kg/cm^3 at 170K m=152.3kg
+  //http://www.pd.infn.it/~conti/images/LXe/LXEdensity.jpg
+
+  TCut z2="fPositionZ_cm < 5.6+48.72 && fPositionZ_cm > 5.6";
+  TCut r2="fPositionX_cm * fPositionX_cm + fPositionY_cm * fPositionY_cm<25*25 && fPositionX_cm * fPositionX_cm + fPositionY_cm * fPositionY_cm>20*20"; //cm 
+  // volume in r=20.5cm dz=[8.54, 48.6 ]cm; is 5.289e4 cm^3, rho=2.88 kg/cm^3 at 170K m=152.3kg
+  //http://www.pd.infn.it/~conti/images/LXe/LXEdensity.jpg
+
+  //simulate in r=25cm dz=[28-28, 28+28 ]cm; source volume = 3.167 e5 cm^3
+  double rho = 2.88e-3; //kg/cm^3
+  double pi=3.1415927;
+  double massTot = pi*25*25*28*2*rho;
+
+  double r0min=0, r0max=18, z0min=28-16, z0max=28+16;
+  double mass0 = pi*(r0max*r0max - r0min*r0min)*(z0max-z0min)*rho;
+
+  double r1min=0, r1max=20.5, z1min=8.54, z1max=48.6;
+  double mass1 = pi*(r1max*r1max - r1min*r1min)*(z1max-z1min)*rho;
+
+  double r2min=20.5, r2max=23, z2min=5.6, z2max=5.6+48.72;
+  double mass2 = pi*(r2max*r2max - r2min*r2min)*(z2max-z2min)*rho;
 
   string sOutName = fOutName.Data();
   TStopwatch* clock = new TStopwatch();
@@ -257,108 +264,189 @@ double mass2 = pi*23*23*(48.72)*rho - pi*20.5*20.5*(48.6-8.54)*rho;
   TChain* ttree = new TChain("tree", "tree");
   load_chain(txtFileList, ttree);
 
-//  TChain* theader = new TChain("header", "header");
- // load_chain(txtFileList, theader);
+  //  TChain* theader = new TChain("header", "header");
+  // load_chain(txtFileList, theader);
   std::cout<<ttree->GetEntries()<<std::endl;
 
   
-  tree tree_e(ttree); // to be mapped to tree tree;
-//  header header_e(theader); // to be mapped to coin tree;
+  tree e(ttree); // to be mapped to tree tree;
+  //  header header_e(theader); // to be mapped to coin tree;
 
   std::cout<<"success load trees. "<<std::endl;
 
-  TH1F* h0              = new TH1F("he_center", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* h1               = new TH1F("he_fd", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* h2               = new TH1F("he_skin", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-
-double numOfSim= double (ttree->GetEntries());
-for (int ii=0; ii<numOfSim; ii++){
-  ttree->GetEntry(ii);
-  if ( inCenter(tree_e) ) {h0->Fill(tree_e.fTotEDep);}
-
-}
-
-//tree->Draw("fTotEDep>>h0(100,0,100)", "fTotEDep<100"&& z0 && r0);
-//tree->Draw("fTotEDep>>h1(100,0,100)", "fTotEDep<100"&& z1 && r1);
-//tree->Draw("fTotEDep>>h2(100,0,100)", "fTotEDep<100"&& z2 && r2);
-
-
-double dayLength=24*60*60; //second
-double daymBq = dayLength *1.e-3;
-//double mDRU = 1.e-3;
-double fraction; //since the source is confined in xenon space so numOfSims are not uniformly distribute in massTot
-TCut fz1="fPrimaryParPosZ_mm< (28+16)*10 && fPrimaryParPosZ_mm > (28-16)*10";
-TCut fr1="fPrimaryParPosX_mm * fPrimaryParPosX_mm + fPrimaryParPosY_mm * fPrimaryParPosY_mm<100*100"; //cm
-double fmass1 = pi*10.0*10.0*16*2*rho;
-
-TCut fz0="fPrimaryParPosZ_mm< (28+20)*10 && fPrimaryParPosZ_mm > (28-16)*10";
-TCut fr0="fPrimaryParPosX_mm * fPrimaryParPosX_mm + fPrimaryParPosY_mm * fPrimaryParPosY_mm<50*50"; //cm
-double fmass0 = pi*5.0*5*(16+20)*rho;
-double k=ttree->GetEntries(fz0 && fr0)/fmass0;
-
-fraction = 1./(ttree->GetEntries(fr1&&fz1)/fmass1)*(numOfSim/massTot);
-
-h0->SetTitle(";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
-h0->Scale(massTot/mass0/numOfSim*fraction*daymBq);
-h0->SetName("center");
-h0->SetLineColor(kBlue);
-h1->SetTitle(";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
-h1->Scale(massTot/mass1/numOfSim*fraction*daymBq);
-h1->SetName("activeVolume");
-h1->SetLineColor(kRed);
-h2->SetTitle(";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
-h2->Scale(massTot/mass2/numOfSim*fraction*daymBq);
-h2->SetName("skin");
-h2->SetLineColor(kBlack);
-
-h0->Rebin(4);
-h0->Scale(1./4);
-h1->Rebin(4);
-h1->Scale(1./4);
-h2->Rebin(4);
-h2->Scale(1./4);
-
-
-h0->Fit("pol2");
-TF1* f0 = h0->GetFunction("pol2");
-f0->SetLineColor(kBlue);
-if (fitAct){
-h1->Fit("pol1");
-TF1* f1 = h1->GetFunction("pol1");
-f1->SetLineColor(kRed);
-}
+  The_fdF* he_center              = new The_fdF("he_center", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  The_fdF* he_fd               = new The_fdF("he_fd", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  The_fdF* he_skin               = new The_fdF("he_skin", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
 
 
 
+  double numOfSim= double (ttree->GetEntries());
+  for (int ii=0; ii<numOfSim; ii++){
+    ttree->GetEntry(ii);
+    // find single scatter above cathode. and double scatter with one energy deposit site above cathode
+    //
+    //clear value from previous loop.
+    //1 for above cathode, below gate, 2 for below cathode.
+    double ZMin = 999999999.;
+    double ZMax = -999999999.;
+    double ZMinAboveCat = 999999999.;
+    double ZMaxAboveCat = -999999999.;
+    double EAboveCat=0;
+    double delZAboveCat=0;
+    double ZMinBelowCat = 999999999.;
+    double ZMaxBelowCat = -999999999.;
+    double EBelowCat=0;
+    double delZBelowCat=0;
+    bool gX=0; //gamma X, there is energy deposition outside active region.
+    bool sC=0; //single scatter, the delta Z of energy deposition is smaller than 0.6 cm;
+    double XAboveCat=0;//average x, y above cathode by energy to get s2 location
+    double XBelowCat=0;
+    double YAboveCat=0;
+    double YBelowCat=0;
+    double ZAboveCat=0;
+    double ZBelowCat=0;
+    double Z2AboveCat=0;
+    double Z2BelowCat=0; //average z^2
 
-//-----start drawing
+    double ETotal=0;
+
+    for(int j = 0; j < e.iRecordSize; j++) { 
+//      cout<<e.fPositionZ_cm[j] <<"pid"<<e.iParticleID[j] <<endl;
+      if((e.iParticleID[j] == 22 || e.iParticleID[j] == 11 || e.iParticleID[j] == -11)){
+	if (e.fPositionZ_cm[j] < ZMin) {ZMin=e.fPositionZ_cm[j];}
+	if (e.fPositionZ_cm[j] > ZMax) {ZMax=e.fPositionZ_cm[j];}
+	if (e.fPositionZ_cm[j] > 5.6 && e.fPositionZ_cm[j] < 53.92 ){
+	  EAboveCat += e.fEnergyDep_keV[j]; ETotal += e.fEnergyDep_keV[j];
+	  if (e.fPositionZ_cm[j] < ZMinAboveCat) {ZMinAboveCat=e.fPositionZ_cm[j];}
+	  if (e.fPositionZ_cm[j] > ZMaxAboveCat) {ZMaxAboveCat=e.fPositionZ_cm[j];}
+          XAboveCat+= e.fEnergyDep_keV[j]* e.fPositionX_cm[j]; //
+          YAboveCat+= e.fEnergyDep_keV[j]* e.fPositionY_cm[j]; //
+          ZAboveCat+= e.fEnergyDep_keV[j]* e.fPositionZ_cm[j]; //
+          Z2AboveCat+= e.fEnergyDep_keV[j]* pow(e.fPositionZ_cm[j] , 2); //
+	}
+	else if (e.fPositionZ_cm[j] > 0 && e.fPositionZ_cm[j] <= 5.6 ){
+	  EBelowCat += e.fEnergyDep_keV[j]; ETotal += e.fEnergyDep_keV[j]; 
+          gX=1;
+	  if (e.fPositionZ_cm[j] < ZMinBelowCat) {ZMinBelowCat=e.fPositionZ_cm[j];}
+	  if (e.fPositionZ_cm[j] > ZMaxBelowCat) {ZMaxBelowCat=e.fPositionZ_cm[j];}
+          XBelowCat+= e.fEnergyDep_keV[j]* e.fPositionX_cm[j]; //
+          YBelowCat+= e.fEnergyDep_keV[j]* e.fPositionY_cm[j]; //
+          ZBelowCat+= e.fEnergyDep_keV[j]* e.fPositionZ_cm[j]; //
+          Z2BelowCat+= e.fEnergyDep_keV[j]* pow(e.fPositionZ_cm[j] , 2); //
+	}  
+      }
+    }
+    delZAboveCat =ZMaxAboveCat-ZMinAboveCat; 
+    delZBelowCat =ZMaxBelowCat-ZMinBelowCat; 
+    XAboveCat = XAboveCat/EAboveCat;
+    XBelowCat = XBelowCat/EBelowCat;
+    YAboveCat = YAboveCat/EAboveCat;
+    YBelowCat = YBelowCat/EBelowCat;
+    ZAboveCat = ZAboveCat/EAboveCat;
+    ZBelowCat = ZBelowCat/EBelowCat;
+    Z2AboveCat = Z2AboveCat/EAboveCat;
+    Z2BelowCat = Z2BelowCat/EBelowCat;
+
+    double rAboveCat = pow( pow(XAboveCat ,2)+  pow(YAboveCat ,2)  ,0.5) ;
+    double s2width  = pow( Z2AboveCat - pow(ZAboveCat ,2)  ,0.5) ;
+    sC = (s2width<0.6) || (delZAboveCat<0.6); //0.6 cm to be able to separate s1 s2
+/*
+    cout<<rAboveCat<<endl;
+    cout<< s2width<<endl;
+    cout<<ZMinAboveCat<<endl;
+    cout<<ZMaxAboveCat<<endl;
+    cout<<ETotal<<endl;
+    cout<<e.fTotEDep<<endl;
+    cout<<EAboveCat<<endl;
+    cout<<endl<<endl<<endl<<endl<<endl;
+*/
+    if ( inVolume(rAboveCat, ZAboveCat, r0min, z0min, r0max, z0max) && (!gX) && (sC) ) {he_center->Fill(EAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r1min, z1min, r1max, z1max) && (!gX) && (sC) ) {he_fd->Fill(EAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r2min, z2min, r2max, z2max) && (!gX) && (sC) ) {he_skin->Fill(EAboveCat);}
+
+  }
+
+  //tree->Draw("fTotEDep>>he_center(100,0,100)", "fTotEDep<100"&& z0 && r0);
+  //tree->Draw("fTotEDep>>he_fd(100,0,100)", "fTotEDep<100"&& z1 && r1);
+  //tree->Draw("fTotEDep>>he_skin(100,0,100)", "fTotEDep<100"&& z2 && r2);
 
 
-TCanvas* c1 = new TCanvas("c1", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
-c1->Draw();
+  double dayLength=24*60*60; //second
+  double daymBq = dayLength *1.e-3;
+  //double mDRU = 1.e-3;
+  double fraction; //since the source is confined in xenon space so numOfSims are not uniformly distribute in massTot
+  TCut fz1="fPrimaryParPosZ_mm< (28+16)*10 && fPrimaryParPosZ_mm > (28-16)*10";
+  TCut fr1="fPrimaryParPosX_mm * fPrimaryParPosX_mm + fPrimaryParPosY_mm * fPrimaryParPosY_mm<100*100"; //cm
+  double fmass1 = pi*10.0*10.0*16*2*rho;
 
-double skinScale=2.; //--Wei Need to change
+  TCut fz0="fPrimaryParPosZ_mm< (28+20)*10 && fPrimaryParPosZ_mm > (28-16)*10";
+  TCut fr0="fPrimaryParPosX_mm * fPrimaryParPosX_mm + fPrimaryParPosY_mm * fPrimaryParPosY_mm<50*50"; //cm
+  double fmass0 = pi*5.0*5*(16+20)*rho;
+  double k=ttree->GetEntries(fz0 && fr0)/fmass0;
 
-TLegend* tl = new TLegend(0.7,0.8,0.9,0.9);
-tl->AddEntry(h0, "center");
-tl->AddEntry(h1, "active volume");
-TString label= TString::Format("skin * %d",int(skinScale));
-if (drawSkin) {tl->AddEntry(h2, label.Data());}
-h0->Draw();
-h1->Draw("same");
-if (drawSkin) {
-h2->Scale(1./skinScale); //further scale down to plot on the same graph.
-h2->Draw("same");
-}
-tl->Draw("same");
+  fraction = 1./(ttree->GetEntries(fr1&&fz1)/fmass1)*(numOfSim/massTot);
 
-TString tcontent;
-tcontent= TString::Format("#splitline{p0: %.3e }{#splitline{p1: %.3e }{p2: %.3e}}",f0->GetParameter(0), f0->GetParameter(1), f0->GetParameter(2));
-TLatex* tt = new TLatex(100*0.6, 0.15*(h0->GetMaximum() - h0->GetMinimum() )+ h0->GetMinimum(), tcontent.Data());
-tt->SetTextColor(kBlue);   
-tt->SetTextFont(43);
-tt->SetTextSize(25);
-tt->Draw("same");
+  he_center->SetTitle(";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
+  he_center->Scale(massTot/mass0/numOfSim*fraction*daymBq);
+  he_center->SetName("center");
+  he_center->SetLineColor(kBlue);
+  he_fd->SetTitle(";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
+  he_fd->Scale(massTot/mass1/numOfSim*fraction*daymBq);
+  he_fd->SetName("activeVolume");
+  he_fd->SetLineColor(kRed);
+  he_skin->SetTitle(";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
+  he_skin->Scale(massTot/mass2/numOfSim*fraction*daymBq);
+  he_skin->SetName("skin");
+  he_skin->SetLineColor(kBlack);
+
+  he_center->Rebin(4);
+  he_center->Scale(1./4);
+  he_fd->Rebin(4);
+  he_fd->Scale(1./4);
+  he_skin->Rebin(4);
+  he_skin->Scale(1./4);
+
+
+  he_center->Fit("pol2");
+  TF1* f0 = he_center->GetFunction("pol2");
+  f0->SetLineColor(kBlue);
+  if (fitAct){
+    he_fd->Fit("pol1");
+    TF1* f1 = he_fd->GetFunction("pol1");
+    f1->SetLineColor(kRed);
+  }
+
+
+
+
+  //-----start drawing
+
+
+  TCanvas* c1 = new TCanvas("c1", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
+  c1->Draw();
+
+  double skinScale=2.; //--Wei Need to change
+
+  TLegend* tl = new TLegend(0.7,0.8,0.9,0.9);
+  tl->AddEntry(he_center, "center");
+  tl->AddEntry(he_fd, "active volume");
+  TString label= TString::Format("skin * %d",int(skinScale));
+  if (drawSkin) {tl->AddEntry(he_skin, label.Data());}
+  he_center->Draw();
+  he_fd->Draw("same");
+  if (drawSkin) {
+    he_skin->Scale(1./skinScale); //further scale down to plot on the same graph.
+    he_skin->Draw("same");
+  }
+  tl->Draw("same");
+
+  TString tcontent;
+  tcontent= TString::Format("#splitline{p0: %.3e }{#splitline{p1: %.3e }{p2: %.3e}}",f0->GetParameter(0), f0->GetParameter(1), f0->GetParameter(2));
+  TLatex* tt = new TLatex(100*0.6, 0.15*(he_center->GetMaximum() - he_center->GetMinimum() )+ he_center->GetMinimum(), tcontent.Data());
+  tt->SetTextColor(kBlue);   
+  tt->SetTextFont(43);
+  tt->SetTextSize(25);
+  tt->Draw("same");
 
 
   TImage *img = TImage::Create();
