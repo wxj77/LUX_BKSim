@@ -1,6 +1,5 @@
 //how to run
-//root -q -b -l "LUXSimForDiffBetaDecayInXenon.C(\"test.txt\")"
-
+//root -q -b -l "LUXSimForDiffBetaDecayInXenon.C(\"test.txt\", \"test.root\", \"test2\", \"^{214}Pb decay\")"
 
 #ifndef LUXSimForDiffBetaDecayInXenon_C
 #define LUXSimForDiffBetaDecayInXenon_C 1
@@ -76,7 +75,9 @@ bool inVolume (double r, double z, double rmin=0, double zmin=25, double rmax=0,
   return (rin && zin);
 }
 
-int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOutName="test.root", TString fOutfigName="test"){
+int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOutName="test.root", TString fOutfigName="test", TString Particle=""){ 
+
+  
   int WhichStyle =1;
   TStyle *lzStyle = new TStyle("lzStyle","LZ Style");
 
@@ -220,10 +221,11 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
   //---Finish setting plot style
   //---start do calculation of energy spectrum.
 
-  bool drawSkin=false;
-  bool fitAct=false;
+  bool drawSkin=true;
+  bool fitAct=true;
   //double skinScale;
 
+  double skinScale=1.; //--Wei Need to change
 
   //X0:center; X1; active volume; X2->Skin 
 
@@ -248,7 +250,7 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
   double pi=3.1415927;
   double massTot = pi*25*25*28*2*rho;
 
-  double r0min=0, r0max=18, z0min=28-16, z0max=28+16;
+  double r0min=0, r0max=15, z0min=28-15, z0max=28+15;
   double mass0 = pi*(r0max*r0max - r0min*r0min)*(z0max-z0min)*rho;
 
   double r1min=0, r1max=20.5, z1min=8.54, z1max=48.6;
@@ -278,28 +280,44 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
   outFile->cd();
 
 
-  TH1F* he_center              = new TH1F("he_center", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* he_fd               = new TH1F("he_fd", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* he_skin               = new TH1F("he_skin", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* he_center              = new TH1F("he_center", ";Energy [keV];#splitline{event rate per activity mass }{[(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]}", 100, 0, 100);
+  TH1F* he_fd               = new TH1F("he_fd", ";Energy [keV];#splitline{event rate per activity mass }{[(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]}", 100, 0, 100);
+  TH1F* he_skin               = new TH1F("he_skin", ";Energy [keV];#splitline{event rate per activity mass }{[(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]}", 100, 0, 100);
 
-  TH1F* hsc_center              = new TH1F("hsc_center", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* hsc_fd               = new TH1F("hsc_fd", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* hsc_skin               = new TH1F("hsc_skin", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hsc_center              = new TH1F("hsc_center", ";Energy [keV];#splitline{event rate per activity mass }{[(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]}", 100, 0, 100);
+  TH1F* hsc_fd               = new TH1F("hsc_fd", ";Energy [keV];#splitline{event rate per activity mass }{[(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]}", 100, 0, 100);
+  TH1F* hsc_skin               = new TH1F("hsc_skin", ";Energy [keV];#splitline{event rate per activity mass }{[(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]}", 100, 0, 100);
 
-  TH1F* hgxsc_center              = new TH1F("hgxsc_center", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* hgxsc_fd               = new TH1F("hgxsc_fd", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* hgxsc_skin               = new TH1F("hgxsc_skin", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hgxsc_center              = new TH1F("hgxsc_center", ";Energy [keV];#splitline{event rate per activity mass }{[(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]}", 100, 0, 100);
+  TH1F* hgxsc_fd               = new TH1F("hgxsc_fd", ";Energy [keV];#splitline{event rate per activity mass }{[(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]}", 100, 0, 100);
+  TH1F* hgxsc_skin               = new TH1F("hgxsc_skin", ";Energy [keV];#splitline{event rate per activity mass }{[(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]}", 100, 0, 100);
+
+  TH1F* hall_center              = new TH1F("hall_center", ";Energy [keV];#splitline{event rate per activity mass }{[(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]}", 100, 0, 100);
+  TH1F* hall_fd               = new TH1F("hall_fd", ";Energy [keV];#splitline{event rate per activity mass }{[(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]}", 100, 0, 100);
+  TH1F* hall_skin               = new TH1F("hall_skin", ";Energy [keV];#splitline{event rate per activity mass }{[(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]}", 100, 0, 100);
+
 
   TH2F* he_center_xy               = new TH2F("he_center_xy ", "; x [cm]; y [cm]", 100, -30, 30, 100, -30, 30);
   TH2F* hsc_center_xy               = new TH2F("hsc_center_xy ", "; x [cm]; y [cm]", 100, -30, 30, 100, 30, 30);
   TH2F* hgxsc_center_xy               = new TH2F("hgxsc_center_xy ", "; x [cm]; y [cm]", 100, -30, 30, 100, -30, 30);
 
+  TH1F* hr100               = new TH1F("hr100", ";r^{2} [cm^{2}]; #splitline{event rate}{[(mBq/ kg)^{-1} kg^{-1} day^{-1}]}", 600, 0, 600);
+  TH1F* hr50               = new TH1F("hr50", ";r^{2} [cm^{2}]; #splitline{event rate}{[(mBq/ kg)^{-1} kg^{-1} day^{-1}]}", 600, 0, 600);
+  TH1F* hr20               = new TH1F("hr20", ";r^{2} [cm^{2}]; #splitline{event rate}{[(mBq/ kg)^{-1} kg^{-1} day^{-1}]}", 600, 0, 600);
 
-//  double numOfSim= double (ttree->GetEntries());
-  double numOfSim= 500000;
+
+
+//-----Wei important, long run change number of sims
+  double numOfSim= double (ttree->GetEntries());
+//  double numOfSim= 10000;
 
   for (int ii=0; ii<numOfSim; ii++){
     ttree->GetEntry(ii);
+    if (Particle[2] != e.cPrimaryParName[2]) {cout<<"error on primary particle: you assign: "<<Particle.Data() <<"    simulation has: "<<e.cPrimaryParName<<endl;}
+    if (Particle[3] != e.cPrimaryParName[3]) {cout<<"error on primary particle: you assign: "<<Particle.Data() <<"    simulation has: "<<e.cPrimaryParName<<endl;}
+    if (Particle[4] != e.cPrimaryParName[4]) {cout<<"error on primary particle: you assign: "<<Particle.Data() <<"    simulation has: "<<e.cPrimaryParName<<endl;}
+    if (Particle[6] != e.cPrimaryParName[0]) {cout<<"error on primary particle: you assign: "<<Particle.Data() <<"    simulation has: "<<e.cPrimaryParName<<endl;}
+    if (Particle[7] != e.cPrimaryParName[1]) {cout<<"error on primary particle: you assign: "<<Particle.Data() <<"    simulation has: "<<e.cPrimaryParName<<endl;}
     // find single scatter above cathode. and double scatter with one energy deposit site above cathode
     //
     //clear value from previous loop.
@@ -400,6 +418,15 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
     if ( inVolume(rAboveCat, ZAboveCat, r1min, z1min, r1max, z1max) && (!gX2) && (sC) ) {hgxsc_fd->Fill(EAboveCat);}
     if ( inVolume(rAboveCat, ZAboveCat, r2min, z2min, r2max, z2max) && (!gX2) && (sC) ) {hgxsc_skin->Fill(EAboveCat);}
 
+    if ( inVolume(rAboveCat, ZAboveCat, 0., z2min, 25., z2max) && (sC) && (EAboveCat<100.)) {hr100->Fill(XAboveCat*XAboveCat + YAboveCat* YAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, 0., z2min, 25., z2max) && (sC) && (EAboveCat<50.)) {hr50->Fill(XAboveCat*XAboveCat + YAboveCat* YAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, 0., z2min, 25., z2max) && (sC) && (EAboveCat<20.)) {hr20->Fill(XAboveCat*XAboveCat + YAboveCat* YAboveCat);}
+
+    if ( inVolume(rAboveCat, ZAboveCat, r0min, z0min, r0max, z0max)  ) {hall_center->Fill(EAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r0min, z0min, r0max, z0max)  ) {hall_fd->Fill(EAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r0min, z0min, r0max, z0max)  ) {hall_skin->Fill(EAboveCat);}
+ 
+
   }
 
   //tree->Draw("fTotEDep>>he_center(100,0,100)", "fTotEDep<100"&& z0 && r0);
@@ -413,58 +440,96 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
   double fraction; //since the source is confined in xenon space so numOfSims are not uniformly distribute in massTot
   TCut fz1="fPrimaryParPosZ_mm< (28+16)*10 && fPrimaryParPosZ_mm > (28-16)*10";
   TCut fr1="fPrimaryParPosX_mm * fPrimaryParPosX_mm + fPrimaryParPosY_mm * fPrimaryParPosY_mm<100*100"; //cm
-  double fmass1 = pi*10.0*10.0*16*2*rho;
+  double fr1min=0, fr1max=10, fz1min=(28-16), fz1max=(28+16);
+  double fmass1 = pi*(fr1max*fr1max - fr1min*fr1min)*(fz1max-fz1min)*rho;
 
   TCut fz0="fPrimaryParPosZ_mm< (28+20)*10 && fPrimaryParPosZ_mm > (28-16)*10";
   TCut fr0="fPrimaryParPosX_mm * fPrimaryParPosX_mm + fPrimaryParPosY_mm * fPrimaryParPosY_mm<50*50"; //cm
   double fmass0 = pi*5.0*5*(16+20)*rho;
   double k=ttree->GetEntries(fz0 && fr0)/fmass0;
 
-  fraction = 1./(ttree->GetEntries(fr1&&fz1)/fmass1)*(numOfSim/massTot);
+  double counts1=0;
+  for (int ii=0; ii<numOfSim; ii++){
+    ttree->GetEntry(ii);
+    if ( inVolume( pow(e.fPrimaryParPosX_mm[0] * e.fPrimaryParPosX_mm[0] + e.fPrimaryParPosY_mm[0] * e.fPrimaryParPosY_mm[0], 0.5), e.fPrimaryParPosZ_mm[0], fr1min*10., fz1min*10., fr1max*10., fz1max*10.) ) {counts1+=1;}
+//    cout<< pow(e.fPrimaryParPosX_mm[0] * e.fPrimaryParPosX_mm[0] + e.fPrimaryParPosY_mm[0] * e.fPrimaryParPosY_mm[0], 0.5)<<endl;
+//    cout<< e.fPrimaryParPosZ_mm[0]<<endl;
+//    cout<<fr1min*10.<<"  "<< fz1min*10.<<"  "<< fr1max*10.<<"  "<< fz1max*10. <<endl;
+  }
+  fraction = 1./(counts1/fmass1);
+  cout<<fraction<<endl;
+  cout<<counts1<<endl;
+  cout<<fmass1<<endl;
+
 
 //  he_center->SetTitle(";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
-  he_center->Scale(massTot/mass0/numOfSim*fraction*daymBq);
+  he_center->Scale(1./mass0*fraction*daymBq);
 //  he_center->SetName("he_center");
   he_center->SetLineColor(kBlue);
 //  he_fd->SetTitle(";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
-  he_fd->Scale(massTot/mass1/numOfSim*fraction*daymBq);
+  he_fd->Scale(1./mass1*fraction*daymBq);
 //  he_fd->SetName("he_fd);
   he_fd->SetLineColor(kRed);
 //  he_skin->SetTitle(";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
-  he_skin->Scale(massTot/mass2/numOfSim*fraction*daymBq);
+  he_skin->Scale(1./mass2*fraction*daymBq);
 //  he_skin->SetName("he_skin");
   he_skin->SetLineColor(kBlack);
 
-  hsc_center->Scale(massTot/mass0/numOfSim*fraction*daymBq);
+  cout<<hsc_center->GetEntries()<<endl;
+  cout<<hsc_fd->GetEntries()<<endl;
+  cout<<hsc_skin->GetEntries()<<endl;
+  cout<<1./mass0*fraction*daymBq<<endl;
+  cout<<1./mass1*fraction*daymBq<<endl;
+  cout<<1./mass2*fraction*daymBq<<endl;
+
+  hsc_center->Scale(1./mass0*fraction*daymBq);
   hsc_center->SetLineColor(kBlue);
-  hsc_fd->Scale(massTot/mass1/numOfSim*fraction*daymBq);
+  hsc_fd->Scale(1./mass1*fraction*daymBq);
   hsc_fd->SetLineColor(kRed);
-  hsc_skin->Scale(massTot/mass2/numOfSim*fraction*daymBq);
+  hsc_skin->Scale(1./mass2*fraction*daymBq);
   hsc_skin->SetLineColor(kBlack);
 
-  hgxsc_center->Scale(massTot/mass0/numOfSim*fraction*daymBq);
+  hgxsc_center->Scale(1./mass0*fraction*daymBq);
   hgxsc_center->SetLineColor(kBlue);
-  hgxsc_fd->Scale(massTot/mass1/numOfSim*fraction*daymBq);
+  hgxsc_fd->Scale(1./mass1*fraction*daymBq);
   hgxsc_fd->SetLineColor(kRed);
-  hgxsc_skin->Scale(massTot/mass2/numOfSim*fraction*daymBq);
+  hgxsc_skin->Scale(1./mass2*fraction*daymBq);
   hgxsc_skin->SetLineColor(kBlack);
 
+  hall_center->Scale(1./mass0*fraction*daymBq);
+  hall_center->SetLineColor(kBlue);
+  hall_fd->Scale(1./mass1*fraction*daymBq);
+  hall_fd->SetLineColor(kRed);
+  hall_skin->Scale(1./mass2*fraction*daymBq);
+  hall_skin->SetLineColor(kBlack);
 
-  he_center->Rebin(4);
-  he_center->Scale(1./4);
-  he_fd->Rebin(4);
-  he_fd->Scale(1./4);
-  he_skin->Rebin(4);
-  he_skin->Scale(1./4);
+
+  hsc_center->Rebin(4);
+  hsc_center->Scale(1./4);
+  hsc_fd->Rebin(4);
+  hsc_fd->Scale(1./4);
+  hsc_skin->Rebin(4);
+  hsc_skin->Scale(1./4);
+
+  hr100->Scale(1./(pi*(25.*25. - 0.*0.)*(z2max-z2min)*rho)*fraction*daymBq*600);//
+  hr100->SetLineColor(kBlack);
+  hr50->Scale(1./(pi*(25.*25. - 0.*0.)*(z2max-z2min)*rho)*fraction*daymBq*600);//
+  hr50->SetLineColor(kBlue);
+  hr20->Scale(1./(pi*(25.*25. - 0.*0.)*(z2max-z2min)*rho)*fraction*daymBq*600);//
+  hr20->SetLineColor(kRed);
 
 
-  he_center->Fit("pol2");
-  TF1* f0 = he_center->GetFunction("pol2");
+  hsc_center->Fit("pol1");
+  TF1* f0 = hsc_center->GetFunction("pol1");
   f0->SetLineColor(kBlue);
+  TF1* f1 = new TF1();
   if (fitAct){
-    he_fd->Fit("pol1");
-    TF1* f1 = he_fd->GetFunction("pol1");
+    hsc_fd->Fit("pol1");
+    f1 = hsc_fd->GetFunction("pol1");
     f1->SetLineColor(kRed);
+//    hsc_skin->Fit("pol2");
+//    TF1* f2 = hsc_skin->GetFunction("pol2");
+//    f2->SetLineColor(kRed);
   }
 
 
@@ -473,47 +538,95 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
   //-----start drawing
 
 
-  TCanvas* c1 = new TCanvas("c1", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
+  TCanvas* c1 = new TCanvas("c1", ";Energy [keV];#splitline{event rate per activity mass }{[(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]}");
   c1->Draw();
 
-  double skinScale=2.; //--Wei Need to change
 
   TLegend* tl = new TLegend(0.7,0.8,0.9,0.9);
-  tl->AddEntry(he_center, "center");
-  tl->AddEntry(he_fd, "active volume");
-  TString label= TString::Format("skin * %d",int(skinScale));
-  if (drawSkin) {tl->AddEntry(he_skin, label.Data());}
-  he_center->Draw();
-  he_center->GetYaxis()->SetRangeUser(-0.2*(he_center->GetMaximum() - he_center->GetMinimum() )+ he_center->GetMinimum(), 1.5*(he_center->GetMaximum() - he_center->GetMinimum() )+ he_center->GetMinimum());
-  he_fd->Draw("same");
+  tl->AddEntry(hsc_center, "center");
+  tl->AddEntry(hsc_fd, "active volume");
+  TString label= TString::Format("skin");// * %d",int(skinScale));
+  if (drawSkin) {tl->AddEntry(hsc_skin, label.Data());}
+  double hmin=0;
+//  hmin=-0.2*(hsc_center->GetMaximum() - hsc_center->GetMinimum() )+ hsc_center->GetMinimum();
+  double hmax=1.05*(hsc_skin->GetMaximum() - hsc_center->GetMinimum() )+ hsc_center->GetMinimum();
+  hsc_center->GetYaxis()->SetRangeUser(hmin, hmax);
+
+  hsc_center->Draw();
+  
+  hsc_fd->Draw("same");
   if (drawSkin) {
-    he_skin->Scale(1./skinScale); //further scale down to plot on the same graph.
-    he_skin->Draw("same");
+    hsc_skin->Scale(1./skinScale); //further scale down to plot on the same graph.
+    hsc_skin->Draw("same");
   }
   tl->Draw("same");
 
   TString tcontent;
-  tcontent= TString::Format("#splitline{p0: %.3e }{#splitline{p1: %.3e }{p2: %.3e}}",f0->GetParameter(0), f0->GetParameter(1), f0->GetParameter(2));
-  TLatex* tt = new TLatex(100*0.6, 0.15*(he_center->GetMaximum() - he_center->GetMinimum() )+ he_center->GetMinimum(), tcontent.Data());
+  tcontent= TString::Format("#splitline{p0: %.3e }{#splitline{p1: %.3e }{}}",f0->GetParameter(0), f0->GetParameter(1));
+  TLatex* tt = new TLatex(100*0.6, 0.05*(hmax - hmin )+ hmin, tcontent.Data());
   tt->SetTextColor(kBlue);   
   tt->SetTextFont(43);
-  tt->SetTextSize(25);
+  tt->SetTextSize(20);
   tt->Draw("same");
+  if (fitAct){
+  tcontent= TString::Format("#splitline{p0: %.3e }{#splitline{p1: %.3e }{}}",f1->GetParameter(0), f1->GetParameter(1));
+  TLatex* tt1 = new TLatex(100*0.2, 0.05*(hmax - hmin )+ hmin, tcontent.Data());
+  tt1->SetTextColor(kRed);   
+  tt1->SetTextFont(43);
+  tt1->SetTextSize(20);
+  tt1->Draw("same");
+  }
+  tcontent= TString::Format("%s", Particle.Data());
+  TLatex* ttp = new TLatex(100*0.05, 0.90*(hmax - hmin )+ hmin, tcontent.Data());
+  ttp->SetTextColor(kBlack);   
+  ttp->SetTextFont(43);
+  ttp->SetTextSize(20);
+  ttp->Draw("same");
 
-
+  cout<<hmin<<"  "<<hmax<<endl;
   TImage *img = TImage::Create();
   TString figname;
-  figname = TString::Format("test.png") ;
+  figname = TString::Format("rate%s.png", fOutfigName.Data()) ;
   c1->Update();  
   img->FromPad(c1);
   img->WriteImage(figname.Data());
   std::cout << figname.Data()<<std::endl;
 
+  TCanvas* c2 = new TCanvas("c2", ";r^{2} [cm^{2}]; #splitline{event rate}{[(mBq/ kg)^{-1} kg^{-1} day^{-1}]}");
+  c2->Draw();
+  c2->cd();
+  hmin=0;
+//  hmin=-0.2*(hsc_center->GetMaximum() - hsc_center->GetMinimum() )+ hsc_center->GetMinimum();
+  hmax=1.05*(hr100->GetMaximum() - hr100->GetMinimum() )+ hr100->GetMinimum();
+
+  hr100->Rebin(30);
+  hr100->Scale(1./30);
+  hr100->Draw();
+  hr50->Rebin(30);
+  hr50->Scale(1./30);
+  hr50->Draw("same");
+  hr20->Rebin(30);
+  hr20->Scale(1./30);
+  hr20->Draw("same");
+  ttp->Draw("same");
+  TLegend* tl2 = new TLegend(0.7,0.8,0.9,0.9);
+  tl2->AddEntry(hr100, "below 100 keV");
+  tl2->AddEntry(hr50, "below 50 keV");
+  tl2->AddEntry(hr20, "below 20 keV");
+  tl2->Draw("same");
+
+  TImage *img2 = TImage::Create();
+  TString figname2;
+  figname2 = TString::Format("hr%s.png", fOutfigName.Data()) ;
+  c2->Update();  
+  img2->FromPad(c2);
+  img2->WriteImage(figname2.Data());
+  std::cout << figname2.Data()<<std::endl;
 
   outFile->Write();
-//  he_center->Write();
-//  he_fd->Write();
-//  he_skin->Write();
+//  hsc_center->Write();
+//  hsc_fd->Write();
+//  hsc_skin->Write();
 
   return 1;
 }
