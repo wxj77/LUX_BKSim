@@ -18,8 +18,8 @@
 #include "TString.h"
 #include "TTree.h"
 #include "TChain.h"
-#include "The_fdF.h"
-#include "The_skinF.h"
+#include "TH1F.h"
+#include "TH2F.h"
 #include "TH3F.h"
 #include "TMath.h"
 #include "TCanvas.h"
@@ -274,13 +274,30 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
 
   std::cout<<"success load trees. "<<std::endl;
 
-  The_fdF* he_center              = new The_fdF("he_center", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  The_fdF* he_fd               = new The_fdF("he_fd", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  The_fdF* he_skin               = new The_fdF("he_skin", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TFile * outFile = new TFile(fOutName.Data(), "recreate");
+  outFile->cd();
 
 
+  TH1F* he_center              = new TH1F("he_center", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* he_fd               = new TH1F("he_fd", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* he_skin               = new TH1F("he_skin", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
 
-  double numOfSim= double (ttree->GetEntries());
+  TH1F* hsc_center              = new TH1F("hsc_center", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hsc_fd               = new TH1F("hsc_fd", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hsc_skin               = new TH1F("hsc_skin", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+
+  TH1F* hgxsc_center              = new TH1F("hgxsc_center", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hgxsc_fd               = new TH1F("hgxsc_fd", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hgxsc_skin               = new TH1F("hgxsc_skin", ";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+
+  TH2F* he_center_xy               = new TH2F("he_center_xy ", "; x [cm]; y [cm]", 100, -30, 30, 100, -30, 30);
+  TH2F* hsc_center_xy               = new TH2F("hsc_center_xy ", "; x [cm]; y [cm]", 100, -30, 30, 100, 30, 30);
+  TH2F* hgxsc_center_xy               = new TH2F("hgxsc_center_xy ", "; x [cm]; y [cm]", 100, -30, 30, 100, -30, 30);
+
+
+//  double numOfSim= double (ttree->GetEntries());
+  double numOfSim= 500000;
+
   for (int ii=0; ii<numOfSim; ii++){
     ttree->GetEntry(ii);
     // find single scatter above cathode. and double scatter with one energy deposit site above cathode
@@ -297,7 +314,7 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
     double ZMaxBelowCat = -999999999.;
     double EBelowCat=0;
     double delZBelowCat=0;
-    bool gX=0; //gamma X, there is energy deposition outside active region.
+    bool gX=0, gX1=0, gX2=0; //gamma X, there is energy deposition outside active region. gX1: there is event above cathode below gate, gX2: there is event below cathode
     bool sC=0; //single scatter, the delta Z of energy deposition is smaller than 0.6 cm;
     double XAboveCat=0;//average x, y above cathode by energy to get s2 location
     double XBelowCat=0;
@@ -317,6 +334,7 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
 	if (e.fPositionZ_cm[j] > ZMax) {ZMax=e.fPositionZ_cm[j];}
 	if (e.fPositionZ_cm[j] > 5.6 && e.fPositionZ_cm[j] < 53.92 ){
 	  EAboveCat += e.fEnergyDep_keV[j]; ETotal += e.fEnergyDep_keV[j];
+          gX1=1;
 	  if (e.fPositionZ_cm[j] < ZMinAboveCat) {ZMinAboveCat=e.fPositionZ_cm[j];}
 	  if (e.fPositionZ_cm[j] > ZMaxAboveCat) {ZMaxAboveCat=e.fPositionZ_cm[j];}
           XAboveCat+= e.fEnergyDep_keV[j]* e.fPositionX_cm[j]; //
@@ -325,8 +343,9 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
           Z2AboveCat+= e.fEnergyDep_keV[j]* pow(e.fPositionZ_cm[j] , 2); //
 	}
 	else if (e.fPositionZ_cm[j] > 0 && e.fPositionZ_cm[j] <= 5.6 ){
+//    cout<<endl<<endl<<"set gX flag 1 here."<<endl<<endl<<endl;
 	  EBelowCat += e.fEnergyDep_keV[j]; ETotal += e.fEnergyDep_keV[j]; 
-          gX=1;
+          gX2=1;
 	  if (e.fPositionZ_cm[j] < ZMinBelowCat) {ZMinBelowCat=e.fPositionZ_cm[j];}
 	  if (e.fPositionZ_cm[j] > ZMaxBelowCat) {ZMaxBelowCat=e.fPositionZ_cm[j];}
           XBelowCat+= e.fEnergyDep_keV[j]* e.fPositionX_cm[j]; //
@@ -350,19 +369,36 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
     double rAboveCat = pow( pow(XAboveCat ,2)+  pow(YAboveCat ,2)  ,0.5) ;
     double s2width  = pow( Z2AboveCat - pow(ZAboveCat ,2)  ,0.5) ;
     sC = (s2width<0.6) || (delZAboveCat<0.6); //0.6 cm to be able to separate s1 s2
+    gX = gX1 && gX2;
 /*
+    cout<<endl<<endl<<endl<<endl<<endl;
     cout<<rAboveCat<<endl;
+    cout<<XAboveCat<<endl;
+    cout<<YAboveCat<<endl;
+    cout<<ZAboveCat<<endl;
     cout<< s2width<<endl;
     cout<<ZMinAboveCat<<endl;
     cout<<ZMaxAboveCat<<endl;
+    cout<<ZMinBelowCat<<endl;
+    cout<<ZMaxBelowCat<<endl;
     cout<<ETotal<<endl;
     cout<<e.fTotEDep<<endl;
     cout<<EAboveCat<<endl;
+    cout<<gX<<"  "<<sC<<endl;
     cout<<endl<<endl<<endl<<endl<<endl;
-*/
-    if ( inVolume(rAboveCat, ZAboveCat, r0min, z0min, r0max, z0max) && (!gX) && (sC) ) {he_center->Fill(EAboveCat);}
-    if ( inVolume(rAboveCat, ZAboveCat, r1min, z1min, r1max, z1max) && (!gX) && (sC) ) {he_fd->Fill(EAboveCat);}
-    if ( inVolume(rAboveCat, ZAboveCat, r2min, z2min, r2max, z2max) && (!gX) && (sC) ) {he_skin->Fill(EAboveCat);}
+    cout<<inVolume(rAboveCat, ZAboveCat, r0min, z0min, r0max, z0max)<<endl;*/
+
+    if ( inVolume(rAboveCat, ZAboveCat, r0min, z0min, r0max, z0max) && (!gX) && (!gX2) && (sC) ) {he_center->Fill(EAboveCat); he_center_xy->Fill(XAboveCat, YAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r1min, z1min, r1max, z1max) && (!gX) && (!gX2) && (sC) ) {he_fd->Fill(EAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r2min, z2min, r2max, z2max) && (!gX) && (!gX2) && (sC) ) {he_skin->Fill(EAboveCat);}
+
+    if ( inVolume(rAboveCat, ZAboveCat, r0min, z0min, r0max, z0max) && (sC) ) {hsc_center->Fill(EAboveCat);hsc_center_xy->Fill(XAboveCat, YAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r1min, z1min, r1max, z1max) && (sC) ) {hsc_fd->Fill(EAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r2min, z2min, r2max, z2max) && (sC) ) {hsc_skin->Fill(EAboveCat);}
+
+    if ( inVolume(rAboveCat, ZAboveCat, r0min, z0min, r0max, z0max) && (!gX2) && (sC) ) {hgxsc_center->Fill(EAboveCat);hgxsc_center_xy->Fill(XAboveCat, YAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r1min, z1min, r1max, z1max) && (!gX2) && (sC) ) {hgxsc_fd->Fill(EAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r2min, z2min, r2max, z2max) && (!gX2) && (sC) ) {hgxsc_skin->Fill(EAboveCat);}
 
   }
 
@@ -386,18 +422,33 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
 
   fraction = 1./(ttree->GetEntries(fr1&&fz1)/fmass1)*(numOfSim/massTot);
 
-  he_center->SetTitle(";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
+//  he_center->SetTitle(";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
   he_center->Scale(massTot/mass0/numOfSim*fraction*daymBq);
-  he_center->SetName("center");
+//  he_center->SetName("he_center");
   he_center->SetLineColor(kBlue);
-  he_fd->SetTitle(";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
+//  he_fd->SetTitle(";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
   he_fd->Scale(massTot/mass1/numOfSim*fraction*daymBq);
-  he_fd->SetName("activeVolume");
+//  he_fd->SetName("he_fd);
   he_fd->SetLineColor(kRed);
-  he_skin->SetTitle(";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
+//  he_skin->SetTitle(";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
   he_skin->Scale(massTot/mass2/numOfSim*fraction*daymBq);
-  he_skin->SetName("skin");
+//  he_skin->SetName("he_skin");
   he_skin->SetLineColor(kBlack);
+
+  hsc_center->Scale(massTot/mass0/numOfSim*fraction*daymBq);
+  hsc_center->SetLineColor(kBlue);
+  hsc_fd->Scale(massTot/mass1/numOfSim*fraction*daymBq);
+  hsc_fd->SetLineColor(kRed);
+  hsc_skin->Scale(massTot/mass2/numOfSim*fraction*daymBq);
+  hsc_skin->SetLineColor(kBlack);
+
+  hgxsc_center->Scale(massTot/mass0/numOfSim*fraction*daymBq);
+  hgxsc_center->SetLineColor(kBlue);
+  hgxsc_fd->Scale(massTot/mass1/numOfSim*fraction*daymBq);
+  hgxsc_fd->SetLineColor(kRed);
+  hgxsc_skin->Scale(massTot/mass2/numOfSim*fraction*daymBq);
+  hgxsc_skin->SetLineColor(kBlack);
+
 
   he_center->Rebin(4);
   he_center->Scale(1./4);
@@ -433,6 +484,7 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
   TString label= TString::Format("skin * %d",int(skinScale));
   if (drawSkin) {tl->AddEntry(he_skin, label.Data());}
   he_center->Draw();
+  he_center->GetYaxis()->SetRangeUser(-0.2*(he_center->GetMaximum() - he_center->GetMinimum() )+ he_center->GetMinimum(), 1.5*(he_center->GetMaximum() - he_center->GetMinimum() )+ he_center->GetMinimum());
   he_fd->Draw("same");
   if (drawSkin) {
     he_skin->Scale(1./skinScale); //further scale down to plot on the same graph.
@@ -457,6 +509,11 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
   img->WriteImage(figname.Data());
   std::cout << figname.Data()<<std::endl;
 
+
+  outFile->Write();
+//  he_center->Write();
+//  he_fd->Write();
+//  he_skin->Write();
 
   return 1;
 }
