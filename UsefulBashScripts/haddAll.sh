@@ -18,6 +18,7 @@ done
 
 for f in *.root; do
 	echo ${f:0:${#f}-5}_Trim.root 
-	root -q -b "/nfs/farm/g/superb/u01/lz/wxj//LUX_BKSim/BackgroundSim/trimtree.C(\"$f\", \"${f:0:${#f}-5}_Trim.root\")"	
+	root -q -b "/nfs/farm/g/superb/u01/lz/wxj//LUX_BKSim/BackgroundSim/trimtree.C(\"$f\", \"${f:0:${#f}-5}_Trim.root\")"
+#	echo rm -i $f
 done
 
