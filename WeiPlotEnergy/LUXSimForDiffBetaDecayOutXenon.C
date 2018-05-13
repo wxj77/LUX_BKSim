@@ -1,10 +1,11 @@
 //how to run
-//root -q -b -l "LUXSimForDiffBetaDecayOutXenon.C(\"test.txt\", \"test.root\", \"test2\", \"^{214}Pb beta decay\")"
+//root -q -b -l "LUXSimForDiffBetaDecayInXenon.C(\"test.txt\", \"test.root\", \"test2\", \"^{214}Pb decay\")"
 
-#ifndef LUXSimForDiffBetaDecayInXenon_C
-#define LUXSimForDiffBetaDecayInXenon_C 1
+#ifndef LUXSimForDiffBetaDecayOutXenon_C
+#define LUXSimForDiffBetaDecayOutXenon_C 1
 
 int debug=0;
+int lograte=1;
 
 //-1: use all events.
 //0: use maximum 500000 events.
@@ -322,42 +323,42 @@ lzStyle->SetNumberContours(totcol);*/
   outFile->cd();
 
 
-  TH1F* he_center              = new TH1F("he_center", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* he_fd               = new TH1F("he_fd", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* he_skin               = new TH1F("he_skin", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* he_center              = new TH1F("he_center", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts mBq^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* he_fd               = new TH1F("he_fd", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts mBq^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* he_skin               = new TH1F("he_skin", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts mBq^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
 
-  TH1F* hsc_center              = new TH1F("hsc_center", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* hsc_fd               = new TH1F("hsc_fd", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* hsc_skin               = new TH1F("hsc_skin", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hsc_center              = new TH1F("hsc_center", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts mBq^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hsc_fd               = new TH1F("hsc_fd", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts mBq^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hsc_skin               = new TH1F("hsc_skin", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts mBq^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
 
-  TH1F* hgxsc_center              = new TH1F("hgxsc_center", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* hgxsc_fd               = new TH1F("hgxsc_fd", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* hgxsc_skin               = new TH1F("hgxsc_skin", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hgxsc_center              = new TH1F("hgxsc_center", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts mBq^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hgxsc_fd               = new TH1F("hgxsc_fd", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts mBq^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hgxsc_skin               = new TH1F("hgxsc_skin", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts mBq^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
 
-  TH1F* hall_center              = new TH1F("hall_center", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* hall_fd               = new TH1F("hall_fd", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* hall_skin               = new TH1F("hall_skin", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hall_center              = new TH1F("hall_center", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts mBq^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hall_fd               = new TH1F("hall_fd", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts mBq^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hall_skin               = new TH1F("hall_skin", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts mBq^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
 
 
   TH2F* he_center_xy               = new TH2F("he_center_xy ", "; x [cm]; y [cm]", 100, -30, 30, 100, -30, 30);
   TH2F* hsc_center_xy               = new TH2F("hsc_center_xy ", "; x [cm]; y [cm]", 100, -30, 30, 100, 30, 30);
   TH2F* hgxsc_center_xy               = new TH2F("hgxsc_center_xy ", "; x [cm]; y [cm]", 100, -30, 30, 100, -30, 30);
 
-  TH1F* hr100sc               = new TH1F("hr100sc", ";r^{2} [cm^{2}]; event rate at z center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 600, 0, 600);
-  TH1F* hr50sc               = new TH1F("hr50sc", ";r^{2} [cm^{2}]; event rate at z center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 600, 0, 600);
-  TH1F* hr20sc               = new TH1F("hr20sc", ";r^{2} [cm^{2}]; event rate at z center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 600, 0, 600);
+  TH1F* hr100sc               = new TH1F("hr100sc", ";r^{2} [cm^{2}]; event rate at z center [cts mBq^{-1} kg^{-1} day^{-1}]", 600, 0, 600);
+  TH1F* hr50sc               = new TH1F("hr50sc", ";r^{2} [cm^{2}]; event rate at z center [cts mBq^{-1} kg^{-1} day^{-1}]", 600, 0, 600);
+  TH1F* hr20sc               = new TH1F("hr20sc", ";r^{2} [cm^{2}]; event rate at z center [cts mBq^{-1} kg^{-1} day^{-1}]", 600, 0, 600);
 
-  TH1F* hr100gxsc               = new TH1F("hr100gxsc", ";z [cm]; event rate at z center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 600, 0, 600);
-  TH1F* hr50gxsc               = new TH1F("hr50gxsc", ";z [cm]; event rate at z center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 600, 0, 600);
-  TH1F* hr20gxsc               = new TH1F("hr20gxsc", ";z [cm]; event rate at z center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 600, 0, 600);
+  TH1F* hr100gxsc               = new TH1F("hr100gxsc", ";z [cm]; event rate at z center [cts mBq^{-1} kg^{-1} day^{-1}]", 600, 0, 600);
+  TH1F* hr50gxsc               = new TH1F("hr50gxsc", ";z [cm]; event rate at z center [cts mBq^{-1} kg^{-1} day^{-1}]", 600, 0, 600);
+  TH1F* hr20gxsc               = new TH1F("hr20gxsc", ";z [cm]; event rate at z center [cts mBq^{-1} kg^{-1} day^{-1}]", 600, 0, 600);
 
-  TH1F* hz100sc               = new TH1F("hz100sc", ";z [cm]; event rate at r center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 60, 0, 60);
-  TH1F* hz50sc               = new TH1F("hz50sc", ";z [cm]; event rate at r center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 60, 0, 60);
-  TH1F* hz20sc               = new TH1F("hz20sc", ";z [cm]; event rate at r center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 60, 0, 60);
+  TH1F* hz100sc               = new TH1F("hz100sc", ";z [cm]; event rate at r center [cts mBq^{-1} kg^{-1} day^{-1}]", 60, 0, 60);
+  TH1F* hz50sc               = new TH1F("hz50sc", ";z [cm]; event rate at r center [cts mBq^{-1} kg^{-1} day^{-1}]", 60, 0, 60);
+  TH1F* hz20sc               = new TH1F("hz20sc", ";z [cm]; event rate at r center [cts mBq^{-1} kg^{-1} day^{-1}]", 60, 0, 60);
 
-  TH1F* hz100gxsc               = new TH1F("hz100gxsc", ";z [cm]; event rate at r center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 60, 0, 60);
-  TH1F* hz50gxsc               = new TH1F("hz50gxsc", ";z [cm]; event rate at r center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 60, 0, 60);
-  TH1F* hz20gxsc               = new TH1F("hz20gxsc", ";r^{2} [cm^{2}]; event rate at r center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 60, 0, 60);
+  TH1F* hz100gxsc               = new TH1F("hz100gxsc", ";z [cm]; event rate at r center [cts mBq^{-1} kg^{-1} day^{-1}]", 60, 0, 60);
+  TH1F* hz50gxsc               = new TH1F("hz50gxsc", ";z [cm]; event rate at r center [cts mBq^{-1} kg^{-1} day^{-1}]", 60, 0, 60);
+  TH1F* hz20gxsc               = new TH1F("hz20gxsc", ";r^{2} [cm^{2}]; event rate at r center [cts mBq^{-1} kg^{-1} day^{-1}]", 60, 0, 60);
 
   TH2F* hrz50sc               = new TH2F("hrz50sc", ";r^{2} [cm^{2}];z [cm]", 600, 0, 600, 70, 0, 70);
   TH2F* hrz50gxsc               = new TH2F("hrz50gxsc", ";r^{2} [cm^{2}];z [cm]", 600, 0, 600, 70, 0, 70);
@@ -365,14 +366,13 @@ lzStyle->SetNumberContours(totcol);*/
 
 //-----Wei important, long run change number of sims
   double numOfSim= double (ttree->GetEntries());
-  if (debug==0) {if (numOfSim>2.e8) {numOfSim = 2.e8;}}
-  if (debug==1) {if (numOfSim>2000.) {numOfSim = 2000.;}}
-  if (debug==2) {if (numOfSim>20000.) {numOfSim = 20000.;}}
+  if (debug==0) {if (numOfSim<500000.) {numOfSim = 500000.;}}
+  if (debug==1) {if (numOfSim<2000.) {numOfSim = 2000.;}}
+  if (debug==2) {if (numOfSim<20000.) {numOfSim = 20000.;}}
   std::cout<<"number of entry used: "<<numOfSim<<std::endl;
   for (int ii=0; ii<numOfSim; ii++){
     ttree->GetEntry(ii);
-/*
-    bool wrongParticleName1=0; 
+/*    bool wrongParticleName1=0; 
     if (Particle[2] != e.cPrimaryParName[2]) {wrongParticleName1=1;}
     if (Particle[3] != e.cPrimaryParName[3]) {wrongParticleName1=1;}
     if (Particle[4] != e.cPrimaryParName[4]) {wrongParticleName1=1;}
@@ -388,9 +388,7 @@ lzStyle->SetNumberContours(totcol);*/
     if (Particle[4] != e.cPrimaryParName[0]) {wrongParticleName3=1;}
 
     if (wrongParticleName1 && wrongParticleName2 && wrongParticleName3) {cout<<"error on primary particle: you assign: "<<Particle.Data() <<"    simulation has: "<<e.cPrimaryParName<<endl;}
-*/
-
-    // find single scatter above cathode. and double scatter with one energy deposit site above cathode
+*/    // find single scatter above cathode. and double scatter with one energy deposit site above cathode
     //
     //clear value from previous loop.
     //1 for above cathode, below gate, 2 for below cathode.
@@ -547,9 +545,9 @@ lzStyle->SetNumberContours(totcol);*/
   TCut fr0="fPrimaryParPosX_mm * fPrimaryParPosX_mm + fPrimaryParPosY_mm * fPrimaryParPosY_mm<50*50"; //cm
   double fmass0 = pi*5.0*5*(16+20)*rho;
 //  double k=ttree->GetEntries(fz0 && fr0)/fmass0;
-
+/*
   double counts1=0;
-/*  for (int ii=0; ii<numOfSim; ii++){
+  for (int ii=0; ii<numOfSim; ii++){
     ttree->GetEntry(ii);
     if ( inVolume( pow(e.fPrimaryParPosX_mm[0] * e.fPrimaryParPosX_mm[0] + e.fPrimaryParPosY_mm[0] * e.fPrimaryParPosY_mm[0], 0.5), e.fPrimaryParPosZ_mm[0], fr1min*10., fz1min*10., fr1max*10., fz1max*10.) ) {counts1+=1;}
 //    cout<< pow(e.fPrimaryParPosX_mm[0] * e.fPrimaryParPosX_mm[0] + e.fPrimaryParPosY_mm[0] * e.fPrimaryParPosY_mm[0], 0.5)<<endl;
@@ -558,21 +556,21 @@ lzStyle->SetNumberContours(totcol);*/
   }
   fraction = 1./(counts1/fmass1);
 */
-  fraction =1;
+fraction=1.;
 /*  cout<<fraction<<endl;
   cout<<counts1<<endl;
   cout<<fmass1<<endl;*/
 
 
-//  he_center->SetTitle(";Energy deposit between gate grid and cathode grid [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
+//  he_center->SetTitle(";Energy deposit between gate grid and cathode grid [keV];event rate per activity mass [mBq^{-1} kg^{-1} day^{-1} keV^{-1}]");
   he_center->Scale(1./mass0*fraction*daymBq);
 //  he_center->SetName("he_center");
   he_center->SetLineColor(kBlue+2);
-//  he_fd->SetTitle(";Energy deposit between gate grid and cathode grid [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
+//  he_fd->SetTitle(";Energy deposit between gate grid and cathode grid [keV];event rate per activity mass [mBq^{-1} kg^{-1} day^{-1} keV^{-1}]");
   he_fd->Scale(1./mass1*fraction*daymBq);
 //  he_fd->SetName("he_fd);
   he_fd->SetLineColor(kRed+2);
-//  he_skin->SetTitle(";Energy deposit between gate grid and cathode grid [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
+//  he_skin->SetTitle(";Energy deposit between gate grid and cathode grid [keV];event rate per activity mass [mBq^{-1} kg^{-1} day^{-1} keV^{-1}]");
   he_skin->Scale(1./mass2*fraction*daymBq);
 //  he_skin->SetName("he_skin");
   he_skin->SetLineColor(kGreen+2);
@@ -684,11 +682,12 @@ lzStyle->SetNumberContours(totcol);*/
   //-----start drawing
 
 
-  TCanvas* c1 = new TCanvas("c1", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
+  TCanvas* c1 = new TCanvas("c1", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts mBq^{-1} kg^{-1} day^{-1} keV^{-1}]");
   c1->Draw();
-
+  if (lograte) {c1->SetLogy();}
 
   double hmin=0;
+  if (lograte) {hmin = 0.95*hsc_center->GetMinimum();}
 //  hmin=-0.2*(hsc_center->GetMaximum() - hsc_center->GetMinimum() )+ hsc_center->GetMinimum();
   double hmax= 1.25*hsc_skin->GetMaximum(); //1.3*(hsc_skin->GetMaximum() - hsc_center->GetMinimum() )+ hsc_center->GetMinimum();
   hsc_center->GetYaxis()->SetRangeUser(hmin, hmax);
@@ -763,9 +762,11 @@ lzStyle->SetNumberContours(totcol);*/
 
 //----rate vs r^2
 
-  TCanvas* c2 = new TCanvas("c2", ";r^{2} [cm^{2}]; event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]");
+  TCanvas* c2 = new TCanvas("c2", ";r^{2} [cm^{2}]; event rate [cts mBq^{-1} kg^{-1} day^{-1}]");
   c2->Draw();
   c2->cd();
+
+
   hr100sc->Rebin(10);
   hr100sc->Scale(1./10);
   hr50sc->Rebin(10);
@@ -780,7 +781,10 @@ lzStyle->SetNumberContours(totcol);*/
   hr20gxsc->Rebin(10);
   hr20gxsc->Scale(1./10);
 
+  if (lograte) {c2->SetLogy();}
+
   hmin=0;
+  if (lograte) {hmin = 0.95*hr20sc->GetMinimum();}
 //  hmin=-0.2*(hsc_center->GetMaximum() - hsc_center->GetMinimum() )+ hsc_center->GetMinimum();
   hmax=1.25*hr100sc->GetMaximum();//1.3*(hr100sc->GetMaximum() - hr100sc->GetMinimum() )+ hr100sc->GetMinimum();
   hr100sc->GetYaxis()->SetRangeUser(hmin, hmax);
@@ -828,7 +832,7 @@ lzStyle->SetNumberContours(totcol);*/
 
 //----rate vs z
 
-  TCanvas* c3 = new TCanvas("c3", ";z [cm]; event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]");
+  TCanvas* c3 = new TCanvas("c3", ";z [cm]; event rate [cts mBq^{-1} kg^{-1} day^{-1}]");
   c3->Draw();
   c3->cd();
  /*
@@ -846,7 +850,10 @@ lzStyle->SetNumberContours(totcol);*/
   hz20gxsc->Rebin(2);
   hz20gxsc->Scale(1./2);
 */
+  if (lograte) {c3->SetLogy();}
+
   hmin=0;
+  if (lograte) {hmin = 0.95*hz20sc->GetMinimum();}
 //  hmin=-0.2*(hsc_center->GetMaximum() - hsc_center->GetMinimum() )+ hsc_center->GetMinimum();
   hmax=1.25*hz100sc->GetMaximum();//1.3*(hr100sc->GetMaximum() - hr100sc->GetMinimum() )+ hr100sc->GetMinimum();
   hz100sc->GetYaxis()->SetRangeUser(hmin, hmax);
@@ -960,7 +967,7 @@ lzStyle->SetNumberContours(totcol);*/
 
 //---single scatter +gammax
 
-  TCanvas* c4 = new TCanvas("c5", "");
+  TCanvas* c5 = new TCanvas("c5", "");
   c5->Draw();
   c5->cd();
   hrz50gxsc->GetZaxis()->SetRangeUser(0, hrzmax);

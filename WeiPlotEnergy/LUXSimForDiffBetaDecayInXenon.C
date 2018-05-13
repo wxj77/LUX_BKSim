@@ -5,6 +5,7 @@
 #define LUXSimForDiffBetaDecayInXenon_C 1
 
 int debug=0;
+//int lograte=1;
 
 //-1: use all events.
 //0: use maximum 500000 events.
@@ -681,9 +682,10 @@ lzStyle->SetNumberContours(totcol);*/
 
   TCanvas* c1 = new TCanvas("c1", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
   c1->Draw();
-
+  if (lograte) {c1->SetLogy();}
 
   double hmin=0;
+  if (lograte) {hmin = 0.95*hsc_center->GetMinimum();}
 //  hmin=-0.2*(hsc_center->GetMaximum() - hsc_center->GetMinimum() )+ hsc_center->GetMinimum();
   double hmax= 1.25*hsc_skin->GetMaximum(); //1.3*(hsc_skin->GetMaximum() - hsc_center->GetMinimum() )+ hsc_center->GetMinimum();
   hsc_center->GetYaxis()->SetRangeUser(hmin, hmax);
@@ -761,6 +763,8 @@ lzStyle->SetNumberContours(totcol);*/
   TCanvas* c2 = new TCanvas("c2", ";r^{2} [cm^{2}]; event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]");
   c2->Draw();
   c2->cd();
+
+
   hr100sc->Rebin(10);
   hr100sc->Scale(1./10);
   hr50sc->Rebin(10);
@@ -775,7 +779,10 @@ lzStyle->SetNumberContours(totcol);*/
   hr20gxsc->Rebin(10);
   hr20gxsc->Scale(1./10);
 
+  if (lograte) {c2->SetLogy();}
+
   hmin=0;
+  if (lograte) {hmin = 0.95*hr20sc->GetMinimum();}
 //  hmin=-0.2*(hsc_center->GetMaximum() - hsc_center->GetMinimum() )+ hsc_center->GetMinimum();
   hmax=1.25*hr100sc->GetMaximum();//1.3*(hr100sc->GetMaximum() - hr100sc->GetMinimum() )+ hr100sc->GetMinimum();
   hr100sc->GetYaxis()->SetRangeUser(hmin, hmax);
@@ -841,7 +848,10 @@ lzStyle->SetNumberContours(totcol);*/
   hz20gxsc->Rebin(2);
   hz20gxsc->Scale(1./2);
 */
+  if (lograte) {c3->SetLogy();}
+
   hmin=0;
+  if (lograte) {hmin = 0.95*hz20sc->GetMinimum();}
 //  hmin=-0.2*(hsc_center->GetMaximum() - hsc_center->GetMinimum() )+ hsc_center->GetMinimum();
   hmax=1.25*hz100sc->GetMaximum();//1.3*(hr100sc->GetMaximum() - hr100sc->GetMinimum() )+ hr100sc->GetMinimum();
   hz100sc->GetYaxis()->SetRangeUser(hmin, hmax);
@@ -955,7 +965,7 @@ lzStyle->SetNumberContours(totcol);*/
 
 //---single scatter +gammax
 
-  TCanvas* c4 = new TCanvas("c5", "");
+  TCanvas* c5 = new TCanvas("c5", "");
   c5->Draw();
   c5->cd();
   hrz50gxsc->GetZaxis()->SetRangeUser(0, hrzmax);
