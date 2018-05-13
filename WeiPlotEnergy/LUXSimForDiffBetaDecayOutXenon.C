@@ -1,5 +1,5 @@
 //how to run
-//root -q -b -l "LUXSimForDiffBetaDecayInXenon.C(\"test.txt\", \"test.root\", \"test2\", \"^{214}Pb decay\")"
+//root -q -b -l "LUXSimForDiffBetaDecayOutXenon.C(\"test.txt\", \"test.root\", \"test2\", \"^{214}Pb beta decay\")"
 
 #ifndef LUXSimForDiffBetaDecayInXenon_C
 #define LUXSimForDiffBetaDecayInXenon_C 1
@@ -82,7 +82,7 @@ bool inVolume (double r, double z, double rmin=0, double zmin=25, double rmax=0,
   return (rin && zin);
 }
 
-int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOutName="test.root", TString fOutfigName="test", TString Particle=""){ 
+int LUXSimForDiffBetaDecayOutXenon(TString txtFileList = "test.txt", TString fOutName="test.root", TString fOutfigName="test", TString Particle=""){ 
 
   
   int WhichStyle =4;
@@ -365,12 +365,13 @@ lzStyle->SetNumberContours(totcol);*/
 
 //-----Wei important, long run change number of sims
   double numOfSim= double (ttree->GetEntries());
-  if (debug==0) {if (numOfSim<500000.) {numOfSim = 500000.;}}
-  if (debug==1) {if (numOfSim<2000.) {numOfSim = 2000.;}}
-  if (debug==2) {if (numOfSim<20000.) {numOfSim = 20000.;}}
+  if (debug==0) {if (numOfSim>2.e8) {numOfSim = 2.e8;}}
+  if (debug==1) {if (numOfSim>2000.) {numOfSim = 2000.;}}
+  if (debug==2) {if (numOfSim>20000.) {numOfSim = 20000.;}}
   std::cout<<"number of entry used: "<<numOfSim<<std::endl;
   for (int ii=0; ii<numOfSim; ii++){
     ttree->GetEntry(ii);
+/*
     bool wrongParticleName1=0; 
     if (Particle[2] != e.cPrimaryParName[2]) {wrongParticleName1=1;}
     if (Particle[3] != e.cPrimaryParName[3]) {wrongParticleName1=1;}
@@ -387,6 +388,8 @@ lzStyle->SetNumberContours(totcol);*/
     if (Particle[4] != e.cPrimaryParName[0]) {wrongParticleName3=1;}
 
     if (wrongParticleName1 && wrongParticleName2 && wrongParticleName3) {cout<<"error on primary particle: you assign: "<<Particle.Data() <<"    simulation has: "<<e.cPrimaryParName<<endl;}
+*/
+
     // find single scatter above cathode. and double scatter with one energy deposit site above cathode
     //
     //clear value from previous loop.
@@ -546,7 +549,7 @@ lzStyle->SetNumberContours(totcol);*/
 //  double k=ttree->GetEntries(fz0 && fr0)/fmass0;
 
   double counts1=0;
-  for (int ii=0; ii<numOfSim; ii++){
+/*  for (int ii=0; ii<numOfSim; ii++){
     ttree->GetEntry(ii);
     if ( inVolume( pow(e.fPrimaryParPosX_mm[0] * e.fPrimaryParPosX_mm[0] + e.fPrimaryParPosY_mm[0] * e.fPrimaryParPosY_mm[0], 0.5), e.fPrimaryParPosZ_mm[0], fr1min*10., fz1min*10., fr1max*10., fz1max*10.) ) {counts1+=1;}
 //    cout<< pow(e.fPrimaryParPosX_mm[0] * e.fPrimaryParPosX_mm[0] + e.fPrimaryParPosY_mm[0] * e.fPrimaryParPosY_mm[0], 0.5)<<endl;
@@ -554,6 +557,8 @@ lzStyle->SetNumberContours(totcol);*/
 //    cout<<fr1min*10.<<"  "<< fz1min*10.<<"  "<< fr1max*10.<<"  "<< fz1max*10. <<endl;
   }
   fraction = 1./(counts1/fmass1);
+*/
+  fraction =1;
 /*  cout<<fraction<<endl;
   cout<<counts1<<endl;
   cout<<fmass1<<endl;*/
