@@ -1,5 +1,11 @@
 #!/bin/bash
+
+# how to run bash drawAll.sh ../../background/LUXR4Background100_newnewtrim_rootfiles/
+newfolder=new
 folder=$1
+if [[ "$#" -gt 1 ]]; then
+  newfolder=$2
+fi
 
 function sourceName(){
   if [ "$s" = "Kr85" ]; then name="^{85}Kr";fi
@@ -11,5 +17,6 @@ function sourceName(){
 for s in Kr85 Rn220 Rn222 Xe127; do
   ls ${folder}/XENON/${s}/rootfiles/*.root > test1.txt;
   sourceName
-  root -q -b -l "LUXSimForDiffBetaDecayInXenon.C(\"test1.txt\", \"${s}.root\", \"${s}\", \"${name}\")"
+  mkdir -p ${newfolder}
+  root -q -b -l "LUXSimForDiffBetaDecayInXenon.C(\"test1.txt\", \"${s}.root\", \"${newfolder}/${s}\", \"${name}\")"
 done

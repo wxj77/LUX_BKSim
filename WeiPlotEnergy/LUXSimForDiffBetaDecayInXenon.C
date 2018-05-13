@@ -4,6 +4,13 @@
 #ifndef LUXSimForDiffBetaDecayInXenon_C
 #define LUXSimForDiffBetaDecayInXenon_C 1
 
+int debug=0;
+
+//-1: use all events.
+//0: use maximum 500000 events.
+//1: use maximum 2000 events.
+//2: use maximum 20000 events.
+
 //c lib
 #include <iostream>
 #include <fstream>
@@ -83,8 +90,8 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
 
   Int_t FontStyle = 42;
   Float_t FontSizeLabel = 0.04;
-  Float_t FontSizeTitle = 0.04;
-  Float_t YOffsetTitle = 1.4;
+  Float_t FontSizeTitle = 0.035;
+  Float_t YOffsetTitle = 1.6;
  
   switch(WhichStyle) {
   case 1:
@@ -128,7 +135,7 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
 
   // set the paper & margin sizes
   lzStyle->SetPaperSize(20, 26);
-  lzStyle->SetPadTopMargin(0.1);
+  lzStyle->SetPadTopMargin(0.2);
   lzStyle->SetPadBottomMargin(0.15);
   lzStyle->SetPadRightMargin(0.13); // 0.075 -> 0.13 for colz option
   lzStyle->SetPadLeftMargin(0.16);//to include both large/small font options
@@ -167,7 +174,7 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
   lzStyle->SetTitleW(0.8f);
 
   // use bold lines and markers
-  lzStyle->SetMarkerStyle(6);
+  lzStyle->SetMarkerStyle(1);
   lzStyle->SetHistLineWidth( Width_t(2.5) );
   lzStyle->SetLineStyleString(2, "[12 12]"); // postscript dashes
   
@@ -187,26 +194,59 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
   // functions blue
   lzStyle->SetFuncColor(600-4);
 
-  lzStyle->SetFillColor(1); // make color fillings (not white)
+//  lzStyle->SetFillColor(1); // make color fillings (not white)
   // - color setup for 2D -
   // - "cold"/ blue-ish -
-  double red[]   = { 0.00, 0.09, 0.18, 0.09, 0.00 };
-  double green[] = { 0.01, 0.02, 0.39, 0.68, 0.97 };
-  double blue[]  = { 0.17, 0.39, 0.62, 0.79, 0.97 };
+//  double red[]   = { 0.00, 0.09, 0.18, 0.09, 0.00 };
+//  double green[] = { 0.01, 0.02, 0.39, 0.68, 0.97 };
+//  double blue[]  = { 0.17, 0.39, 0.62, 0.79, 0.97 };
+//  double stops[] = { 0.00, 0.02, 0.20, 0.60, 1.00 };
+//  const Int_t NRGBs = 5;
   // - "warm" red-ish colors -
   //  double red[]   = {1.00, 1.00, 0.25 };
   //  double green[] = {1.00, 0.00, 0.00 };
   //  double blue[]  = {0.00, 0.00, 0.00 };
+  //-grey inverted
+    double red[]   = {1.00, 0.00 };
+    double green[] = {1.00, 0.00};
+    double blue[]  = {1.00, 0.00};
+    double stops[]  = {0.00, 1.00};
+const Int_t NRGBs = 2;
+  
 
-  double stops[] = { 0.00, 0.02, 0.20, 0.60, 1.00 };
-  const Int_t NRGBs = 5;
   const Int_t NCont = 255;
 
   TColor::CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont);
   lzStyle->SetNumberContours(NCont);
 
+/*
+const int ncol=10;
+double red[ncol];
+double green[ncol];
+double blue[ncol];
+double stops[ncol];
+
+double dcol = -.1/double(ncol);
+double gray = 1;
+for (int j = 0; j < ncol; j++) {
+//   ...... Define color with RGB equal to : gray, gray, gray .......
+
+   red[j]=gray;
+   blue[j]=gray;
+   green[j]=gray;
+   stops[j]=double(j)/double(ncol-1);
+   gray += dcol;
+}
+const int totcol=50;
+
+TColor::CreateGradientColorTable(ncol, red,green,blue,stops,totcol);
+lzStyle->SetNumberContours(totcol);*/
+
   // - Rainbow -
   //  lzStyle->SetPalette(1);  // use the rainbow color set
+  //   lzStyle->SetPalette(52); //grey
+  //https://root.cern.ch/doc/master/classTColor.html#TColor:SetPalette High quality predefined palettes
+
 
   // -- axis --
   lzStyle->SetStripDecimals(kFALSE); // don't do 1.0 -> 1
@@ -214,7 +254,9 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
   // no supressed zeroes!
   lzStyle->SetHistMinimumZero(kTRUE);
   
-  
+
+
+ 
   gROOT->SetStyle("lzStyle");
   gROOT->ForceStyle(kTRUE);
 
@@ -250,7 +292,7 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
   double pi=3.1415927;
   double massTot = pi*25*25*28*2*rho;
 
-  double r0min=0, r0max=15, z0min=28-15, z0max=28+15;
+  double r0min=0, r0max=10, z0min=28-10, z0max=28+10;
   double mass0 = pi*(r0max*r0max - r0min*r0min)*(z0max-z0min)*rho;
 
   double r1min=0, r1max=20.5, z1min=8.54, z1max=48.6;
@@ -280,37 +322,53 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
   outFile->cd();
 
 
-  TH1F* he_center              = new TH1F("he_center", ";Energy [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* he_fd               = new TH1F("he_fd", ";Energy [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* he_skin               = new TH1F("he_skin", ";Energy [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* he_center              = new TH1F("he_center", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* he_fd               = new TH1F("he_fd", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* he_skin               = new TH1F("he_skin", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
 
-  TH1F* hsc_center              = new TH1F("hsc_center", ";Energy [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* hsc_fd               = new TH1F("hsc_fd", ";Energy [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* hsc_skin               = new TH1F("hsc_skin", ";Energy [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hsc_center              = new TH1F("hsc_center", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hsc_fd               = new TH1F("hsc_fd", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hsc_skin               = new TH1F("hsc_skin", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
 
-  TH1F* hgxsc_center              = new TH1F("hgxsc_center", ";Energy [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* hgxsc_fd               = new TH1F("hgxsc_fd", ";Energy [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* hgxsc_skin               = new TH1F("hgxsc_skin", ";Energy [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hgxsc_center              = new TH1F("hgxsc_center", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hgxsc_fd               = new TH1F("hgxsc_fd", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hgxsc_skin               = new TH1F("hgxsc_skin", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
 
-  TH1F* hall_center              = new TH1F("hall_center", ";Energy [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* hall_fd               = new TH1F("hall_fd", ";Energy [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
-  TH1F* hall_skin               = new TH1F("hall_skin", ";Energy [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hall_center              = new TH1F("hall_center", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hall_fd               = new TH1F("hall_fd", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
+  TH1F* hall_skin               = new TH1F("hall_skin", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 100, 0, 100);
 
 
   TH2F* he_center_xy               = new TH2F("he_center_xy ", "; x [cm]; y [cm]", 100, -30, 30, 100, -30, 30);
   TH2F* hsc_center_xy               = new TH2F("hsc_center_xy ", "; x [cm]; y [cm]", 100, -30, 30, 100, 30, 30);
   TH2F* hgxsc_center_xy               = new TH2F("hgxsc_center_xy ", "; x [cm]; y [cm]", 100, -30, 30, 100, -30, 30);
 
-  TH1F* hr100               = new TH1F("hr100", ";r^{2} [cm^{2}]; event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 600, 0, 600);
-  TH1F* hr50               = new TH1F("hr50", ";r^{2} [cm^{2}]; event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 600, 0, 600);
-  TH1F* hr20               = new TH1F("hr20", ";r^{2} [cm^{2}]; event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 600, 0, 600);
+  TH1F* hr100sc               = new TH1F("hr100sc", ";r^{2} [cm^{2}]; event rate at z center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 600, 0, 600);
+  TH1F* hr50sc               = new TH1F("hr50sc", ";r^{2} [cm^{2}]; event rate at z center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 600, 0, 600);
+  TH1F* hr20sc               = new TH1F("hr20sc", ";r^{2} [cm^{2}]; event rate at z center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 600, 0, 600);
 
+  TH1F* hr100gxsc               = new TH1F("hr100gxsc", ";z [cm]; event rate at z center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 600, 0, 600);
+  TH1F* hr50gxsc               = new TH1F("hr50gxsc", ";z [cm]; event rate at z center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 600, 0, 600);
+  TH1F* hr20gxsc               = new TH1F("hr20gxsc", ";z [cm]; event rate at z center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 600, 0, 600);
+
+  TH1F* hz100sc               = new TH1F("hz100sc", ";z [cm]; event rate at r center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 60, 0, 60);
+  TH1F* hz50sc               = new TH1F("hz50sc", ";z [cm]; event rate at r center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 60, 0, 60);
+  TH1F* hz20sc               = new TH1F("hz20sc", ";z [cm]; event rate at r center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 60, 0, 60);
+
+  TH1F* hz100gxsc               = new TH1F("hz100gxsc", ";z [cm]; event rate at r center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 60, 0, 60);
+  TH1F* hz50gxsc               = new TH1F("hz50gxsc", ";z [cm]; event rate at r center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 60, 0, 60);
+  TH1F* hz20gxsc               = new TH1F("hz20gxsc", ";r^{2} [cm^{2}]; event rate at r center [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]", 60, 0, 60);
+
+  TH2F* hrz50sc               = new TH2F("hrz50sc", ";r^{2} [cm^{2}];z [cm]", 600, 0, 600, 70, 0, 70);
+  TH2F* hrz50gxsc               = new TH2F("hrz50gxsc", ";r^{2} [cm^{2}];z [cm]", 600, 0, 600, 70, 0, 70);
 
 
 //-----Wei important, long run change number of sims
   double numOfSim= double (ttree->GetEntries());
-//  double numOfSim= 1000;
-
+  if (debug==0) {if (numOfSim<500000.) {numOfSim = 500000.;}}
+  if (debug==1) {if (numOfSim<2000.) {numOfSim = 2000.;}}
+  if (debug==2) {if (numOfSim<20000.) {numOfSim = 20000.;}}
+  std::cout<<"number of entry used: "<<numOfSim<<std::endl;
   for (int ii=0; ii<numOfSim; ii++){
     ttree->GetEntry(ii);
     bool wrongParticleName1=0; 
@@ -397,7 +455,7 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
 
     double rAboveCat = pow( pow(XAboveCat ,2)+  pow(YAboveCat ,2)  ,0.5) ;
     double s2width  = pow( Z2AboveCat - pow(ZAboveCat ,2)  ,0.5) ;
-    sC = (s2width<0.6) || (delZAboveCat<0.6); //0.6 cm to be able to separate s1 s2
+    sC = (s2width<0.6) || (delZAboveCat<0.6); //0.6 cm to be able to separate s1 s2 //single scatter at between gate grid and anode grid.
     gX = gX1 && gX2;
 /*
     cout<<endl<<endl<<endl<<endl<<endl;
@@ -417,26 +475,45 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
     cout<<endl<<endl<<endl<<endl<<endl;
     cout<<inVolume(rAboveCat, ZAboveCat, r0min, z0min, r0max, z0max)<<endl;*/
 
-    if ( inVolume(rAboveCat, ZAboveCat, r0min, z0min, r0max, z0max) && (!gX) && (!gX2) && (sC) ) {he_center->Fill(EAboveCat); he_center_xy->Fill(XAboveCat, YAboveCat);}
-    if ( inVolume(rAboveCat, ZAboveCat, r1min, z1min, r1max, z1max) && (!gX) && (!gX2) && (sC) ) {he_fd->Fill(EAboveCat);}
-    if ( inVolume(rAboveCat, ZAboveCat, r2min, z2min, r2max, z2max) && (!gX) && (!gX2) && (sC) ) {he_skin->Fill(EAboveCat);}
+    bool smalle = (EAboveCat<100.) && (EAboveCat>0);
+    if ( inVolume(rAboveCat, ZAboveCat, r0min, z0min, r0max, z0max) && (!gX) && (!gX2) && (sC) && smalle) {he_center->Fill(EAboveCat); he_center_xy->Fill(XAboveCat, YAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r1min, z1min, r1max, z1max) && (!gX) && (!gX2) && (sC) && smalle) {he_fd->Fill(EAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r2min, z2min, r2max, z2max) && (!gX) && (!gX2) && (sC) && smalle) {he_skin->Fill(EAboveCat);}
 
-    if ( inVolume(rAboveCat, ZAboveCat, r0min, z0min, r0max, z0max) && (!gX2) && (sC) ) {hsc_center->Fill(EAboveCat);hsc_center_xy->Fill(XAboveCat, YAboveCat);}
-    if ( inVolume(rAboveCat, ZAboveCat, r1min, z1min, r1max, z1max) && (!gX2) && (sC) ) {hsc_fd->Fill(EAboveCat);}
-    if ( inVolume(rAboveCat, ZAboveCat, r2min, z2min, r2max, z2max) && (!gX2) && (sC) ) {hsc_skin->Fill(EAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r0min, z0min, r0max, z0max) && (!gX2) && (sC) && smalle) {hsc_center->Fill(EAboveCat);hsc_center_xy->Fill(XAboveCat, YAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r1min, z1min, r1max, z1max) && (!gX2) && (sC) && smalle) {hsc_fd->Fill(EAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r2min, z2min, r2max, z2max) && (!gX2) && (sC) && smalle) {hsc_skin->Fill(EAboveCat);}
 
-    if ( inVolume(rAboveCat, ZAboveCat, r0min, z0min, r0max, z0max) && (gX2) && (sC) ) {hgxsc_center->Fill(EAboveCat);hgxsc_center_xy->Fill(XAboveCat, YAboveCat);}
-    if ( inVolume(rAboveCat, ZAboveCat, r1min, z1min, r1max, z1max) && (gX2) && (sC) ) {hgxsc_fd->Fill(EAboveCat);}
-    if ( inVolume(rAboveCat, ZAboveCat, r2min, z2min, r2max, z2max) && (gX2) && (sC) ) {hgxsc_skin->Fill(EAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r0min, z0min, r0max, z0max) && (sC) && smalle) {hgxsc_center->Fill(EAboveCat);hgxsc_center_xy->Fill(XAboveCat, YAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r1min, z1min, r1max, z1max) && (sC) && smalle) {hgxsc_fd->Fill(EAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r2min, z2min, r2max, z2max) && (sC) && smalle) {hgxsc_skin->Fill(EAboveCat);}
 
-    if ( inVolume(rAboveCat, ZAboveCat, 0., z2min, 25., z2max) && (sC) && (EAboveCat<100.)) {hr100->Fill(XAboveCat*XAboveCat + YAboveCat* YAboveCat);}
-    if ( inVolume(rAboveCat, ZAboveCat, 0., z2min, 25., z2max) && (sC) && (EAboveCat<50.)) {hr50->Fill(XAboveCat*XAboveCat + YAboveCat* YAboveCat);}
-    if ( inVolume(rAboveCat, ZAboveCat, 0., z2min, 25., z2max) && (sC) && (EAboveCat<20.)) {hr20->Fill(XAboveCat*XAboveCat + YAboveCat* YAboveCat);}
 
     if ( inVolume(rAboveCat, ZAboveCat, r0min, z0min, r0max, z0max)  ) {hall_center->Fill(EAboveCat);}
     if ( inVolume(rAboveCat, ZAboveCat, r0min, z0min, r0max, z0max)  ) {hall_fd->Fill(EAboveCat);}
     if ( inVolume(rAboveCat, ZAboveCat, r0min, z0min, r0max, z0max)  ) {hall_skin->Fill(EAboveCat);}
  
+
+    if ( inVolume(rAboveCat, ZAboveCat, 0., z0min, 25., z0max) && (!gX2) && (sC) && smalle ) {hr100sc->Fill(XAboveCat*XAboveCat + YAboveCat* YAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, 0., z0min, 25., z0max) && (!gX2) && (sC) && (EAboveCat<50.) && (EAboveCat>0)) {hr50sc->Fill(XAboveCat*XAboveCat + YAboveCat* YAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, 0., z0min, 25., z0max) && (!gX2) && (sC) && (EAboveCat<20.) && (EAboveCat>0)) {hr20sc->Fill(XAboveCat*XAboveCat + YAboveCat* YAboveCat);}
+
+    if ( inVolume(rAboveCat, ZAboveCat, 0., z0min, 25., z0max) && (sC) && smalle ) {hr100gxsc->Fill(XAboveCat*XAboveCat + YAboveCat* YAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, 0., z0min, 25., z0max) && (sC) && (EAboveCat<50.) && (EAboveCat>0)) {hr50gxsc->Fill(XAboveCat*XAboveCat + YAboveCat* YAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, 0., z0min, 25., z0max) && (sC) && (EAboveCat<20.) && (EAboveCat>0)) {hr20gxsc->Fill(XAboveCat*XAboveCat + YAboveCat* YAboveCat);}
+
+
+    if ( inVolume(rAboveCat, ZAboveCat, r0min, 0, r0max, 60) && (!gX2) && (sC) && smalle ) {hz100sc->Fill(ZAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r0min, 0, r0max, 60) && (!gX2) && (sC) && (EAboveCat<50.) && (EAboveCat>0)) {hz50sc->Fill(ZAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r0min, 0, r0max, 60) && (!gX2) && (sC) && (EAboveCat<20.) && (EAboveCat>0)) {hz20sc->Fill(ZAboveCat);}
+
+    if ( inVolume(rAboveCat, ZAboveCat, r0min, 0, r0max, 60) && (sC) && smalle ) {hz100gxsc->Fill(ZAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r0min, 0, r0max, 60) && (sC) && (EAboveCat<50.) && (EAboveCat>0)) {hz50gxsc->Fill(ZAboveCat);}
+    if ( inVolume(rAboveCat, ZAboveCat, r0min, 0, r0max, 60) && (sC) && (EAboveCat<20.) && (EAboveCat>0)) {hz20gxsc->Fill(ZAboveCat);}
+ 
+   if ((!gX2) && (sC) && (EAboveCat<50.) && (EAboveCat>0)) {hrz50sc->Fill(XAboveCat*XAboveCat + YAboveCat* YAboveCat, ZAboveCat);}
+   if ((sC) && (EAboveCat<50.) && (EAboveCat>0)) {hrz50gxsc->Fill(XAboveCat*XAboveCat + YAboveCat* YAboveCat, ZAboveCat);}
+
 
   }
 
@@ -457,7 +534,7 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
   TCut fz0="fPrimaryParPosZ_mm< (28+20)*10 && fPrimaryParPosZ_mm > (28-16)*10";
   TCut fr0="fPrimaryParPosX_mm * fPrimaryParPosX_mm + fPrimaryParPosY_mm * fPrimaryParPosY_mm<50*50"; //cm
   double fmass0 = pi*5.0*5*(16+20)*rho;
-  double k=ttree->GetEntries(fz0 && fr0)/fmass0;
+//  double k=ttree->GetEntries(fz0 && fr0)/fmass0;
 
   double counts1=0;
   for (int ii=0; ii<numOfSim; ii++){
@@ -468,79 +545,123 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
 //    cout<<fr1min*10.<<"  "<< fz1min*10.<<"  "<< fr1max*10.<<"  "<< fz1max*10. <<endl;
   }
   fraction = 1./(counts1/fmass1);
-  cout<<fraction<<endl;
+/*  cout<<fraction<<endl;
   cout<<counts1<<endl;
-  cout<<fmass1<<endl;
+  cout<<fmass1<<endl;*/
 
 
-//  he_center->SetTitle(";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
+//  he_center->SetTitle(";Energy deposit between gate grid and cathode grid [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
   he_center->Scale(1./mass0*fraction*daymBq);
 //  he_center->SetName("he_center");
-  he_center->SetLineColor(kBlue);
-//  he_fd->SetTitle(";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
+  he_center->SetLineColor(kBlue+2);
+//  he_fd->SetTitle(";Energy deposit between gate grid and cathode grid [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
   he_fd->Scale(1./mass1*fraction*daymBq);
 //  he_fd->SetName("he_fd);
-  he_fd->SetLineColor(kRed);
-//  he_skin->SetTitle(";Energy [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
+  he_fd->SetLineColor(kRed+2);
+//  he_skin->SetTitle(";Energy deposit between gate grid and cathode grid [keV];event rate per activity mass [(mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
   he_skin->Scale(1./mass2*fraction*daymBq);
 //  he_skin->SetName("he_skin");
-  he_skin->SetLineColor(kBlack);
-
+  he_skin->SetLineColor(kGreen+2);
+/*
   cout<<hsc_center->GetEntries()<<endl;
   cout<<hsc_fd->GetEntries()<<endl;
   cout<<hsc_skin->GetEntries()<<endl;
   cout<<1./mass0*fraction*daymBq<<endl;
   cout<<1./mass1*fraction*daymBq<<endl;
   cout<<1./mass2*fraction*daymBq<<endl;
-
+*/
   hsc_center->Scale(1./mass0*fraction*daymBq);
-  hsc_center->SetLineColor(kBlue);
+  hsc_center->SetLineColor(kBlue+2);
   hsc_fd->Scale(1./mass1*fraction*daymBq);
-  hsc_fd->SetLineColor(kRed);
+  hsc_fd->SetLineColor(kRed+2);
   hsc_skin->Scale(1./mass2*fraction*daymBq);
-  hsc_skin->SetLineColor(kBlack);
+  hsc_skin->SetLineColor(kGreen+2);
 
   hgxsc_center->Scale(1./mass0*fraction*daymBq);
-  hgxsc_center->SetLineColor(kBlue);
+  hgxsc_center->SetLineColor(kBlue+2-4);
   hgxsc_fd->Scale(1./mass1*fraction*daymBq);
-  hgxsc_fd->SetLineColor(kRed);
+  hgxsc_fd->SetLineColor(kRed+2-4);
   hgxsc_skin->Scale(1./mass2*fraction*daymBq);
-  hgxsc_skin->SetLineColor(kBlack);
+  hgxsc_skin->SetLineColor(kGreen+2-4);
+
+  hgxsc_center->SetLineWidth(1);
+  hgxsc_fd->SetLineWidth(1);
+  hgxsc_skin->SetLineWidth(1);
+
 
   hall_center->Scale(1./mass0*fraction*daymBq);
-  hall_center->SetLineColor(kBlue);
+  hall_center->SetLineColor(kBlue+2);
   hall_fd->Scale(1./mass1*fraction*daymBq);
-  hall_fd->SetLineColor(kRed);
+  hall_fd->SetLineColor(kRed+2);
   hall_skin->Scale(1./mass2*fraction*daymBq);
-  hall_skin->SetLineColor(kBlack);
+  hall_skin->SetLineColor(kGreen+2);
 
 
-  hsc_center->Rebin(4);
-  hsc_center->Scale(1./4);
-  hsc_fd->Rebin(4);
-  hsc_fd->Scale(1./4);
-  hsc_skin->Rebin(4);
-  hsc_skin->Scale(1./4);
+  hsc_center->Rebin(2);
+  hsc_center->Scale(1./2);
+  hsc_fd->Rebin(2);
+  hsc_fd->Scale(1./2);
+  hsc_skin->Rebin(2);
+  hsc_skin->Scale(1./2);
 
-  hr100->Scale(1./(pi*(25.*25. - 0.*0.)*(z2max-z2min)*rho)*fraction*daymBq*600);//
-  hr100->SetLineColor(kBlack);
-  hr50->Scale(1./(pi*(25.*25. - 0.*0.)*(z2max-z2min)*rho)*fraction*daymBq*600);//
-  hr50->SetLineColor(kBlue);
-  hr20->Scale(1./(pi*(25.*25. - 0.*0.)*(z2max-z2min)*rho)*fraction*daymBq*600);//
-  hr20->SetLineColor(kRed);
+  hgxsc_center->Rebin(2);
+  hgxsc_center->Scale(1./2);
+  hgxsc_fd->Rebin(2);
+  hgxsc_fd->Scale(1./2);
+  hgxsc_skin->Rebin(2);
+  hgxsc_skin->Scale(1./2);
 
+  hr100sc->Scale(1./(pi*(25.*25. - 0.*0.)*(z2max-z2min)*rho)*fraction*daymBq*600);//
+  hr100sc->SetLineColor(kGreen+2);
+  hr50sc->Scale(1./(pi*(25.*25. - 0.*0.)*(z2max-z2min)*rho)*fraction*daymBq*600);//
+  hr50sc->SetLineColor(kBlue+2);
+  hr20sc->Scale(1./(pi*(25.*25. - 0.*0.)*(z2max-z2min)*rho)*fraction*daymBq*600);//
+  hr20sc->SetLineColor(kRed+2);
+
+  hr100gxsc->Scale(1./(pi*(25.*25. - 0.*0.)*(z2max-z2min)*rho)*fraction*daymBq*600);//
+  hr100gxsc->SetLineColor(kGreen+2-4);
+  hr50gxsc->Scale(1./(pi*(25.*25. - 0.*0.)*(z2max-z2min)*rho)*fraction*daymBq*600);//
+  hr50gxsc->SetLineColor(kBlue+2-4);
+  hr20gxsc->Scale(1./(pi*(25.*25. - 0.*0.)*(z2max-z2min)*rho)*fraction*daymBq*600);//
+  hr20gxsc->SetLineColor(kRed+2-4);
+
+  hr100gxsc->SetLineWidth(1);
+  hr50gxsc->SetLineWidth(1);
+  hr20gxsc->SetLineWidth(1);
+
+
+  hz100sc->Scale(1./(pi*(r0max*r0max - r0min*r0min)*(60.-0.)*rho)*fraction*daymBq*60);//
+  hz100sc->SetLineColor(kGreen+2);
+  hz50sc->Scale(1./(pi*(r0max*r0max - r0min*r0min)*(60.-0.)*rho)*fraction*daymBq*60);//
+  hz50sc->SetLineColor(kBlue+2);
+  hz20sc->Scale(1./(pi*(r0max*r0max - r0min*r0min)*(60.-0.)*rho)*fraction*daymBq*60);//
+  hz20sc->SetLineColor(kRed+2);
+
+  hz100gxsc->Scale(1./(pi*(r0max*r0max - r0min*r0min)*(60.-0.)*rho)*fraction*daymBq*60);//
+  hz100gxsc->SetLineColor(kGreen+2-4);
+  hz50gxsc->Scale(1./(pi*(r0max*r0max - r0min*r0min)*(60.-0.)*rho)*fraction*daymBq*60);//
+  hz50gxsc->SetLineColor(kBlue+2-4);
+  hz20gxsc->Scale(1./(pi*(r0max*r0max - r0min*r0min)*(60.-0.)*rho)*fraction*daymBq*60);//
+  hz20gxsc->SetLineColor(kRed+2-4);
+
+  hz100gxsc->SetLineWidth(1);
+  hz50gxsc->SetLineWidth(1);
+  hz20gxsc->SetLineWidth(1);
+
+  hrz50sc->Scale(1./(pi*600*(70.-0.)*rho)*fraction*daymBq*600*70);//
+  hrz50gxsc->Scale(1./(pi*600*(70.-0.)*rho)*fraction*daymBq*600*70);//
 
   hsc_center->Fit("pol1");
   TF1* f0 = hsc_center->GetFunction("pol1");
-  f0->SetLineColor(kBlue);
+  f0->SetLineColor(kBlue+2);
   TF1* f1 = new TF1();
   if (fitAct){
     hsc_fd->Fit("pol1");
     f1 = hsc_fd->GetFunction("pol1");
-    f1->SetLineColor(kRed);
+    f1->SetLineColor(kRed+2);
 //    hsc_skin->Fit("pol2");
 //    TF1* f2 = hsc_skin->GetFunction("pol2");
-//    f2->SetLineColor(kRed);
+//    f2->SetLineColor(kRed+2);
   }
 
 
@@ -549,18 +670,13 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
   //-----start drawing
 
 
-  TCanvas* c1 = new TCanvas("c1", ";Energy [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
+  TCanvas* c1 = new TCanvas("c1", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1} keV^{-1}]");
   c1->Draw();
 
 
-  TLegend* tl = new TLegend(0.6,0.75,0.85,0.85);
-  tl->AddEntry(hsc_center, "center");
-  tl->AddEntry(hsc_fd, "active volume");
-  TString label= TString::Format("skin");// * %d",int(skinScale));
-  if (drawSkin) {tl->AddEntry(hsc_skin, label.Data());}
   double hmin=0;
 //  hmin=-0.2*(hsc_center->GetMaximum() - hsc_center->GetMinimum() )+ hsc_center->GetMinimum();
-  double hmax=1.3*(hsc_skin->GetMaximum() - hsc_center->GetMinimum() )+ hsc_center->GetMinimum();
+  double hmax= 1.25*hsc_skin->GetMaximum(); //1.3*(hsc_skin->GetMaximum() - hsc_center->GetMinimum() )+ hsc_center->GetMinimum();
   hsc_center->GetYaxis()->SetRangeUser(hmin, hmax);
 
   hsc_center->Draw();
@@ -570,7 +686,30 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
     hsc_skin->Scale(1./skinScale); //further scale down to plot on the same graph.
     hsc_skin->Draw("same");
   }
-  tl->SetTextSize(0.035);
+
+  hgxsc_center->Draw("same");
+  
+  hgxsc_fd->Draw("same");
+  if (drawSkin) {
+    hgxsc_skin->Scale(1./skinScale); //further scale down to plot on the same graph.
+    hgxsc_skin->Draw("same");
+  }
+
+
+
+
+  TLegend* tl = new TLegend(0.15,0.8,0.85,0.9);
+  tl->SetNColumns(3);
+  tl->AddEntry(hsc_center, "center (SC)");
+  tl->AddEntry(hsc_fd, "active volume (SC)");
+  TString label= TString::Format("skin (SC)");// * %d",int(skinScale));
+  if (drawSkin) {tl->AddEntry(hsc_skin, label.Data());}
+  tl->AddEntry(hgxsc_center, "center (SC+GXSC)");
+  tl->AddEntry(hgxsc_fd, "active volume (SC+GXSC)");
+  label= TString::Format("skin (SC+GXSC)");// * %d",int(skinScale));
+  if (drawSkin) {tl->AddEntry(hgxsc_skin, label.Data());}
+
+  tl->SetTextSize(0.023);
   tl->SetFillColor(kWhite);
   tl->SetLineColor(kBlack);
   tl->SetTextColor(kBlack);
@@ -579,14 +718,14 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
   TString tcontent;
   tcontent= TString::Format("#splitline{p0: %.3e }{#splitline{p1: %.3e }{}}",f0->GetParameter(0), f0->GetParameter(1));
   TLatex* tt = new TLatex(100*0.6, 0.05*(hmax - hmin )+ hmin, tcontent.Data());
-  tt->SetTextColor(kBlue);   
+  tt->SetTextColor(kBlue+2);   
   tt->SetTextFont(43);
   tt->SetTextSize(20);
   tt->Draw("same");
   if (fitAct){
   tcontent= TString::Format("#splitline{p0: %.3e }{#splitline{p1: %.3e }{}}",f1->GetParameter(0), f1->GetParameter(1));
   TLatex* tt1 = new TLatex(100*0.2, 0.05*(hmax - hmin )+ hmin, tcontent.Data());
-  tt1->SetTextColor(kRed);   
+  tt1->SetTextColor(kRed+2);   
   tt1->SetTextFont(43);
   tt1->SetTextSize(20);
   tt1->Draw("same");
@@ -601,40 +740,61 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
   cout<<hmin<<"  "<<hmax<<endl;
   TImage *img = TImage::Create();
   TString figname;
-  figname = TString::Format("rate%s.png", fOutfigName.Data()) ;
+  figname = TString::Format("%srate.png", fOutfigName.Data()) ;
   c1->Update();  
   img->FromPad(c1);
   img->WriteImage(figname.Data());
   std::cout << figname.Data()<<std::endl;
 
+
+//----rate vs r^2
+
   TCanvas* c2 = new TCanvas("c2", ";r^{2} [cm^{2}]; event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]");
   c2->Draw();
   c2->cd();
+  hr100sc->Rebin(30);
+  hr100sc->Scale(1./30);
+  hr50sc->Rebin(30);
+  hr50sc->Scale(1./30);
+  hr20sc->Rebin(30);
+  hr20sc->Scale(1./30);
+
+  hr100gxsc->Rebin(30);
+  hr100gxsc->Scale(1./30);
+  hr50gxsc->Rebin(30);
+  hr50gxsc->Scale(1./30);
+  hr20gxsc->Rebin(30);
+  hr20gxsc->Scale(1./30);
+
   hmin=0;
 //  hmin=-0.2*(hsc_center->GetMaximum() - hsc_center->GetMinimum() )+ hsc_center->GetMinimum();
-  hmax=1.3*(hr100->GetMaximum() - hr100->GetMinimum() )+ hr100->GetMinimum();
-  hr100->GetYaxis()->SetRangeUser(hmin, hmax);
-  hr100->Rebin(30);
-  hr100->Scale(1./30);
-  hr100->Draw();
-  hr50->Rebin(30);
-  hr50->Scale(1./30);
-  hr50->Draw("same");
-  hr20->Rebin(30);
-  hr20->Scale(1./30);
-  hr20->Draw("same");
+  hmax=1.25*hr100sc->GetMaximum();//1.3*(hr100sc->GetMaximum() - hr100sc->GetMinimum() )+ hr100sc->GetMinimum();
+  hr100sc->GetYaxis()->SetRangeUser(hmin, hmax);
+ 
+  hr100sc->Draw();
+  hr50sc->Draw("same");
+  hr20sc->Draw("same");
+  hr100gxsc->Draw("same");
+  hr50gxsc->Draw("same");
+  hr20gxsc->Draw("same");
 
   tcontent= TString::Format("%s", Particle.Data());
-  TLatex* ttp2 = new TLatex(100*0.05, 0.85*(hmax - hmin )+ hmin, tcontent.Data());
+  TLatex* ttp2 = new TLatex(600*0.05, 0.85*(hmax - hmin )+ hmin, tcontent.Data());
   ttp2->SetTextColor(kBlack);   
   ttp2->SetTextFont(43);
   ttp2->SetTextSize(30);
   ttp2->Draw("same");
-  TLegend* tl2 = new TLegend(0.6,0.75,0.85,0.85);
-  tl2->AddEntry(hr100, "below 100 keV");
-  tl2->AddEntry(hr50, "below 50 keV");
-  tl2->AddEntry(hr20, "below 20 keV");
-  tl2->SetTextSize(0.035);
+
+  TLegend* tl2 = new TLegend(0.15,0.8,0.85,0.9);
+  tl2->SetNColumns(3);
+  tl2->AddEntry(hr100sc, "below 100 keV (SC)");
+  tl2->AddEntry(hr50sc, "below 50 keV (SC)");
+  tl2->AddEntry(hr20sc, "below 20 keV (SC)");
+  tl2->AddEntry(hr100gxsc, "below 100 keV (SC+GXSC)");
+  tl2->AddEntry(hr50gxsc, "below 50 keV (SC+GXSC)");
+  tl2->AddEntry(hr20gxsc, "below 20 keV (SC+GXSC)");
+
+  tl2->SetTextSize(0.023);
   tl2->SetFillColor(kWhite);
   tl2->SetLineColor(kBlack);
   tl2->SetTextColor(kBlack);
@@ -642,12 +802,194 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
 
   TImage *img2 = TImage::Create();
   TString figname2;
-  figname2 = TString::Format("hr%s.png", fOutfigName.Data()) ;
+  figname2 = TString::Format("%shr.png", fOutfigName.Data()) ;
   c2->Update();  
   img2->FromPad(c2);
   img2->WriteImage(figname2.Data());
   std::cout << figname2.Data()<<std::endl;
 
+
+
+
+
+//----rate vs z
+
+  TCanvas* c3 = new TCanvas("c3", ";z [cm]; event rate [cts (mBq/ kg)^{-1} kg^{-1} day^{-1}]");
+  c3->Draw();
+  c3->cd();
+  hz100sc->Rebin(2);
+  hz100sc->Scale(1./2);
+  hz50sc->Rebin(2);
+  hz50sc->Scale(1./2);
+  hz20sc->Rebin(2);
+  hz20sc->Scale(1./2);
+
+  hz100gxsc->Rebin(2);
+  hz100gxsc->Scale(1./2);
+  hz50gxsc->Rebin(2);
+  hz50gxsc->Scale(1./2);
+  hz20gxsc->Rebin(2);
+  hz20gxsc->Scale(1./2);
+
+  hmin=0;
+//  hmin=-0.2*(hsc_center->GetMaximum() - hsc_center->GetMinimum() )+ hsc_center->GetMinimum();
+  hmax=1.25*hz100sc->GetMaximum();//1.3*(hr100sc->GetMaximum() - hr100sc->GetMinimum() )+ hr100sc->GetMinimum();
+  hz100sc->GetYaxis()->SetRangeUser(hmin, hmax);
+ 
+  hz100sc->Draw();
+  hz50sc->Draw("same");
+  hz20sc->Draw("same");
+  hz100gxsc->Draw("same");
+  hz50gxsc->Draw("same");
+  hz20gxsc->Draw("same");
+
+  tcontent= TString::Format("%s", Particle.Data());
+  TLatex* ttp3 = new TLatex(60*0.05, 0.85*(hmax - hmin )+ hmin, tcontent.Data());
+  ttp3->SetTextColor(kBlack);   
+  ttp3->SetTextFont(43);
+  ttp3->SetTextSize(30);
+  ttp3->Draw("same");
+
+  TLegend* tl3 = new TLegend(0.15,0.8,0.85,0.9);
+  tl3->SetNColumns(3);
+  tl3->AddEntry(hz100sc, "below 100 keV (SC)");
+  tl3->AddEntry(hz50sc, "below 50 keV (SC)");
+  tl3->AddEntry(hz20sc, "below 20 keV (SC)");
+  tl3->AddEntry(hz100gxsc, "below 100 keV (SC+GXSC)");
+  tl3->AddEntry(hz50gxsc, "below 50 keV (SC+GXSC)");
+  tl3->AddEntry(hz20gxsc, "below 20 keV (SC+GXSC)");
+
+  tl3->SetTextSize(0.023);
+  tl3->SetFillColor(kWhite);
+  tl3->SetLineColor(kBlack);
+  tl3->SetTextColor(kBlack);
+  tl3->Draw("same");
+
+  TImage *img3 = TImage::Create();
+  TString figname3;
+  figname3 = TString::Format("%shz.png", fOutfigName.Data()) ;
+  c3->Update();  
+  img3->FromPad(c3);
+  img3->WriteImage(figname3.Data());
+  std::cout << figname3.Data()<<std::endl;
+
+
+//----rate vs r^2 and z
+
+
+  TBox* bcenter = new TBox(r0min*r0min, z0min, r0max*r0max, z0max);
+  bcenter->SetLineColor(kBlue+2);
+  bcenter->SetFillStyle(0); //transparent
+  bcenter->SetLineWidth(3);
+  bcenter->SetLineStyle(1);
+  TBox* bfd = new TBox(r1min*r1min, z1min, r1max*r1max, z1max);
+  bfd->SetLineColor(kRed+2);
+  bfd->SetFillStyle(0); //transparent
+  bfd->SetLineWidth(3);
+  bfd->SetLineStyle(1);
+  TBox* bskin = new TBox(r2min*r2min, z2min, r2max*r2max, z2max);
+  bskin->SetLineColor(kGreen+2);
+  bskin->SetFillStyle(0); //transparent
+  bskin->SetLineWidth(3);
+  bskin->SetLineStyle(1);
+
+
+
+
+
+  double hrzmax = hrz50gxsc->GetMaximum();
+
+ //---single scatter
+  TCanvas* c4 = new TCanvas("c4", "");
+  c4->Draw();
+  c4->cd();
+  hrz50sc->GetYaxis()->SetRangeUser(0, hrzmax);
+
+  hrz50sc->Rebin2D(10, 1);
+  hrz50sc->Scale(1./10/1);
+  hrz50sc->Draw("colz");
+
+  bcenter->Draw("same");
+  bfd->Draw("same");
+  bskin->Draw("same");  
+
+
+  tcontent= TString::Format("%s", Particle.Data());
+  TLatex* ttp4 = new TLatex(600*0.05, 0.85*(70 - 0 )+ 0, tcontent.Data());
+  ttp4->SetTextColor(kBlack);   
+  ttp4->SetTextFont(43);
+  ttp4->SetTextSize(30);
+  ttp4->Draw("same");
+
+
+  TLegend* tl4 = new TLegend(0.15,0.8,0.85,0.9);
+  tl4->SetNColumns(3);
+  tl4->AddEntry(bcenter, "#splitline{center (SC)}{below 50 keV}");
+  tl4->AddEntry(bfd, "#splitline{active volume (SC)}{below 50 keV}");
+  TString label4= TString::Format("#splitline{skin (SC)}{below 50 keV}");// * %d",int(skinScale));      
+  if (drawSkin) {tl4->AddEntry(bskin, label4.Data());}
+
+  tl4->SetTextSize(0.023);
+  tl4->SetFillColor(kWhite);
+  tl4->SetLineColor(kBlack);
+  tl4->SetTextColor(kBlack);
+  tl4->Draw("same");
+
+  TImage *img4 = TImage::Create();
+  TString figname4;
+  figname4 = TString::Format("%shrz.png", fOutfigName.Data()) ;
+  c4->Update();  
+  img4->FromPad(c4);
+  img4->WriteImage(figname4.Data());
+  std::cout << figname4.Data()<<std::endl;
+
+//---single scatter +gammax
+
+  TCanvas* c4 = new TCanvas("c5", "");
+  c5->Draw();
+  c5->cd();
+  hrz50gxsc->GetYaxis()->SetRangeUser(0, hrzmax);
+
+  hrz50gxsc->Rebin2D(10, 1);
+  hrz50gxsc->Scale(1./10/1);
+  hrz50gxsc->Draw("colz");
+
+  bcenter->Draw("same");
+  bfd->Draw("same");
+  bskin->Draw("same");  
+
+
+  tcontent= TString::Format("%s", Particle.Data());
+  TLatex* ttp5 = new TLatex(600*0.05, 0.85*(70 - 0 )+ 0, tcontent.Data());
+  ttp5->SetTextColor(kBlack);   
+  ttp5->SetTextFont(43);
+  ttp5->SetTextSize(30);
+  ttp5->Draw("same");
+
+
+  TLegend* tl5 = new TLegend(0.15,0.8,0.85,0.9);
+  tl5->SetNColumns(3);
+  tl5->AddEntry(bcenter, "#splitline{center (SC+GXSC)}{below 50 keV}");
+  tl5->AddEntry(bfd, "#splitline{active volume (SC+GXSC)}{below 50 keV}");
+  TString label5= TString::Format("#splitline{skin (SC+GXSC)}{below 50 keV}");// * %d",int(skinScale));      
+  if (drawSkin) {tl5->AddEntry(bskin, label5.Data());}
+
+  tl5->SetTextSize(0.023);
+  tl5->SetFillColor(kWhite);
+  tl5->SetLineColor(kBlack);
+  tl5->SetTextColor(kBlack);
+  tl5->Draw("same");
+
+  TImage *img5 = TImage::Create();
+  TString figname5;
+  figname5 = TString::Format("%shrzgxsc.png", fOutfigName.Data()) ;
+  c5->Update();  
+  img5->FromPad(c5);
+  img5->WriteImage(figname5.Data());
+  std::cout << figname5.Data()<<std::endl;
+
+
+//------write output.
   outFile->Write();
 //  hsc_center->Write();
 //  hsc_fd->Write();
