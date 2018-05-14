@@ -14,7 +14,7 @@ function sourceName(){
   if [ "$s" = "Xe127" ]; then name="^{127}Xe beta decay";fi
 }
 
-for s in Kr85 Rn220 Rn222 Xe127; do
+for s in Kr85 Rn220 Rn222; do
   ls ${folder}/XENON/${s}/rootfiles/*.root > test1.txt;
   sourceName
   mkdir -p ${newfolder}

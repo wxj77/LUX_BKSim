@@ -4,13 +4,15 @@
 #ifndef LUXSimForDiffBetaDecayOutXenon_C
 #define LUXSimForDiffBetaDecayOutXenon_C 1
 
-int debug=0;
+int debug=-1;
 int lograte=1;
+double maxscaledown=1.e-5;
+int drawfunction=0;
 
 //-1: use all events.
 //0: use maximum 500000 events.
 //1: use maximum 2000 events.
-//2: use maximum 20000 events.
+//2: use maximum 200000 events.
 
 //c lib
 #include <iostream>
@@ -59,8 +61,9 @@ int lograte=1;
 
 using namespace std;
 
-void load_chain(TString txtFileList, TChain* chain)
+double load_chain(TString txtFileList, TChain* chain)
 {
+  double numOfFiles=0;
   std::cout << "Loading file names from "<<txtFileList << std::endl;
   
   ifstream fileList(txtFileList);
@@ -70,11 +73,15 @@ void load_chain(TString txtFileList, TChain* chain)
   if (fileList.is_open()) {
     while ( getline(fileList, file) ) {
       chain->AddFile(file.c_str());
-      std::cout << "Added to TChain: "<< file << std::endl;
+      numOfFiles+=1;
+      //cout<<numOfFiles<<endl;
+      //std::cout << "Added to TChain: "<< file << std::endl;
     }
     fileList.close();
   }
+  return numOfFiles;
 }
+
 
 
 bool inVolume (double r, double z, double rmin=0, double zmin=25, double rmax=0, double zmax=50.){
@@ -83,7 +90,7 @@ bool inVolume (double r, double z, double rmin=0, double zmin=25, double rmax=0,
   return (rin && zin);
 }
 
-int LUXSimForDiffBetaDecayOutXenon(TString txtFileList = "test.txt", TString fOutName="test.root", TString fOutfigName="test", TString Particle=""){ 
+int LUXSimForDiffBetaDecayOutXenon(TString txtFileList = "test.txt", TString fOutName="test.root", TString fOutfigName="test", TString Particle="", double numOfSpecies=1.){ 
 
   
   int WhichStyle =4;
@@ -306,18 +313,45 @@ lzStyle->SetNumberContours(totcol);*/
   TStopwatch* clock = new TStopwatch();
   clock->Start();
   
-  TChain* ttree = new TChain("tree", "tree");
-  load_chain(txtFileList, ttree);
 
+/*
+  TChain* theader = new TChain("header", "header");
+  load_chain(txtFileList, theader);
+  double nSimP=0;
+  header h(theader);
+  int hentries=theader->GetEntries();
+  for (int ll=0; ll<hentries; ll++){
+     theader->GetEntry(ii);
+     nSimp+=h.iNumRecords;
+}
+ */
+
+  TChain* ttree = new TChain("tree", "tree");
+  double nFiles = load_chain(txtFileList, ttree); //number of simulation is 250000* nFiles, each file has a beamon of 250000
+  double nSims =  250000* nFiles;
+  cout<<"number of files simulated: "<< nFiles<<endl;
+  cout<<"number of counts simulated: "<< nSims<<endl;
+  cout<<"number of counts (per equilibruim activities) simulated: "<< nSims/numOfSpecies <<endl;
   //  TChain* theader = new TChain("header", "header");
   // load_chain(txtFileList, theader);
-  std::cout<<ttree->GetEntries()<<std::endl;
+
 
   
   tree e(ttree); // to be mapped to tree tree;
   //  header header_e(theader); // to be mapped to coin tree;
 
   std::cout<<"success load trees. "<<std::endl;
+
+//-----Wei important, long run change number of sims
+  double numOfSim= double (ttree->GetEntries());
+  cout<<"fraction of recorded/simulated: " << numOfSim/nSims<<endl;
+  if (debug==0) {if (numOfSim>500000.) {numOfSim = 500000.;}}
+  if (debug==1) {if (numOfSim>2000.) {numOfSim = 2000.;}}
+  if (debug==2) {if (numOfSim>200000.) {numOfSim = 200000.;}}
+  std::cout<<"number of entry used: "<<numOfSim<<std::endl;
+
+
+
 
   TFile * outFile = new TFile(fOutName.Data(), "recreate");
   outFile->cd();
@@ -364,14 +398,13 @@ lzStyle->SetNumberContours(totcol);*/
   TH2F* hrz50gxsc               = new TH2F("hrz50gxsc", ";r^{2} [cm^{2}];z [cm]", 600, 0, 600, 70, 0, 70);
 
 
-//-----Wei important, long run change number of sims
-  double numOfSim= double (ttree->GetEntries());
-  if (debug==0) {if (numOfSim<500000.) {numOfSim = 500000.;}}
-  if (debug==1) {if (numOfSim<2000.) {numOfSim = 2000.;}}
-  if (debug==2) {if (numOfSim<20000.) {numOfSim = 20000.;}}
-  std::cout<<"number of entry used: "<<numOfSim<<std::endl;
-  for (int ii=0; ii<numOfSim; ii++){
+ for (int ii=0; ii<numOfSim; ii++){
+    
     ttree->GetEntry(ii);
+    if( e.iRecordSize <=0) {
+    //  cout<<"no record in xenon"<<endl;
+      continue;
+    }
 /*    bool wrongParticleName1=0; 
     if (Particle[2] != e.cPrimaryParName[2]) {wrongParticleName1=1;}
     if (Particle[3] != e.cPrimaryParName[3]) {wrongParticleName1=1;}
@@ -556,7 +589,8 @@ lzStyle->SetNumberContours(totcol);*/
   }
   fraction = 1./(counts1/fmass1);
 */
-fraction=1.;
+fraction=1./nSims;
+fraction=fraction*numOfSpecies;
 /*  cout<<fraction<<endl;
   cout<<counts1<<endl;
   cout<<fmass1<<endl;*/
@@ -663,6 +697,7 @@ fraction=1.;
   hrz50sc->Scale(1./(pi*600*(70.-0.)*rho)*fraction*daymBq*600*70);//
   hrz50gxsc->Scale(1./(pi*600*(70.-0.)*rho)*fraction*daymBq*600*70);//
 
+if (drawfunction){
   hsc_center->Fit("pol1");
   TF1* f0 = hsc_center->GetFunction("pol1");
   f0->SetLineColor(kBlue+2);
@@ -675,21 +710,42 @@ fraction=1.;
 //    TF1* f2 = hsc_skin->GetFunction("pol2");
 //    f2->SetLineColor(kRed+2);
   }
-
+}
 
 
 
   //-----start drawing
-
-
+  double hmean;
+  double hmin;
+  double hmax;
+  double scalemax=1.25;
+  const Int_t nq = 1;
+        Double_t xq[nq];  // position where to compute the quantiles in [0,1]
+        Double_t yq[nq];  // array to contain the quantiles
+  xq[0]=0.05;
   TCanvas* c1 = new TCanvas("c1", ";Energy deposit between gate grid and cathode grid [keV];event rate [cts mBq^{-1} kg^{-1} day^{-1} keV^{-1}]");
   c1->Draw();
   if (lograte) {c1->SetLogy();}
 
-  double hmin=0;
-  if (lograte) {hmin = 0.95*hsc_center->GetMinimum();}
+  if (lograte) scalemax=10.;
+  hmin=0;
+  if (lograte) {
+    hmin = 0.095*hsc_center->GetMinimum();   
+    hmean = hsc_center->GetBinContent(1);
+    //hmean = yq[0];
+    if (hmin< hmean*0.01) {
+         hmin=hmean*0.01;
+        }
+
+  }
+
 //  hmin=-0.2*(hsc_center->GetMaximum() - hsc_center->GetMinimum() )+ hsc_center->GetMinimum();
-  double hmax= 1.25*hsc_skin->GetMaximum(); //1.3*(hsc_skin->GetMaximum() - hsc_center->GetMinimum() )+ hsc_center->GetMinimum();
+  hmax= 1.25*hgxsc_skin->GetMaximum(); //1.3*(hsc_skin->GetMaximum() - hsc_center->GetMinimum() )+ hsc_center->GetMinimum();
+   if (lograte)  {if (hmin<=maxscaledown*hmax) {
+         hmin=maxscaledown*hmax;
+        }}
+
+  if (lograte) {hmax= scalemax*hmax;}
   hsc_center->GetYaxis()->SetRangeUser(hmin, hmax);
 
   hsc_center->Draw();
@@ -729,28 +785,36 @@ fraction=1.;
   tl->Draw("same");
 
   TString tcontent;
+  if (drawfunction)
+{
   tcontent= TString::Format("#splitline{p0: %.3e }{#splitline{p1: %.3e }{}}",f0->GetParameter(0), f0->GetParameter(1));
-  TLatex* tt = new TLatex(100*0.6, 0.05*(hmax - hmin )+ hmin, tcontent.Data());
+//  TLatex* tt = new TLatex(100*0.6, 0.05*(hmax - hmin )+ hmin, tcontent.Data());
+  TLatex* tt = new TLatex(0.586, 0.185, tcontent.Data());
+  tt->SetNDC(kTRUE);
   tt->SetTextColor(kBlue+2);   
   tt->SetTextFont(43);
   tt->SetTextSize(20);
   tt->Draw("same");
   if (fitAct){
   tcontent= TString::Format("#splitline{p0: %.3e }{#splitline{p1: %.3e }{}}",f1->GetParameter(0), f1->GetParameter(1));
-  TLatex* tt1 = new TLatex(100*0.2, 0.05*(hmax - hmin )+ hmin, tcontent.Data());
+//  TLatex* tt1 = new TLatex(100*0.2, 0.05*(hmax - hmin )+ hmin, tcontent.Data());
+  TLatex* tt1 = new TLatex(0.302, 0.185, tcontent.Data());
+  tt1->SetNDC(kTRUE);
   tt1->SetTextColor(kRed+2);   
   tt1->SetTextFont(43);
   tt1->SetTextSize(20);
   tt1->Draw("same");
   }
+}
   tcontent= TString::Format("%s", Particle.Data());
-  TLatex* ttp = new TLatex(100*0.05, 0.85*(hmax - hmin )+ hmin, tcontent.Data());
+//  TLatex* ttp = new TLatex(100*0.05, 0.85*(hmax - hmin )+ hmin, tcontent.Data());
+  TLatex* ttp = new TLatex(0.1955, 0.7025, tcontent.Data());
+  ttp->SetNDC(kTRUE);
   ttp->SetTextColor(kBlack);   
   ttp->SetTextFont(43);
   ttp->SetTextSize(30);
   ttp->Draw("same");
 
-  cout<<hmin<<"  "<<hmax<<endl;
   TImage *img = TImage::Create();
   TString figname;
   figname = TString::Format("%srate.png", fOutfigName.Data()) ;
@@ -784,9 +848,19 @@ fraction=1.;
   if (lograte) {c2->SetLogy();}
 
   hmin=0;
-  if (lograte) {hmin = 0.95*hr20sc->GetMinimum();}
+  if (lograte) {
+    hmin = 0.095*hr20sc->GetMinimum();   
+    hmean = hr20sc->GetBinContent(1);
+    //hmean = yq[0];
+    if (hmin< hmean*0.01) {hmin=hmean*0.01;}
+  }
 //  hmin=-0.2*(hsc_center->GetMaximum() - hsc_center->GetMinimum() )+ hsc_center->GetMinimum();
-  hmax=1.25*hr100sc->GetMaximum();//1.3*(hr100sc->GetMaximum() - hr100sc->GetMinimum() )+ hr100sc->GetMinimum();
+  hmax=1.25*hr100gxsc->GetMaximum();//1.3*(hr100sc->GetMaximum() - hr100sc->GetMinimum() )+ hr100sc->GetMinimum();
+   if (lograte)  {if (hmin<=maxscaledown*hmax) {
+         hmin=maxscaledown*hmax;
+        }}
+
+  if (lograte) {hmax= scalemax*hmax;}
   hr100sc->GetYaxis()->SetRangeUser(hmin, hmax);
  
   hr100sc->Draw();
@@ -797,7 +871,9 @@ fraction=1.;
   hr20gxsc->Draw("same");
 
   tcontent= TString::Format("%s", Particle.Data());
-  TLatex* ttp2 = new TLatex(600*0.05, 0.85*(hmax - hmin )+ hmin, tcontent.Data());
+//  TLatex* ttp2 = new TLatex(600*0.05, 0.85*(hmax - hmin )+ hmin, tcontent.Data());
+  TLatex* ttp2 = new TLatex(0.1955, 0.7025, tcontent.Data());
+  ttp2->SetNDC(kTRUE);
   ttp2->SetTextColor(kBlack);   
   ttp2->SetTextFont(43);
   ttp2->SetTextSize(30);
@@ -853,9 +929,23 @@ fraction=1.;
   if (lograte) {c3->SetLogy();}
 
   hmin=0;
-  if (lograte) {hmin = 0.95*hz20sc->GetMinimum();}
+  if (lograte) {
+    hmin = 0.095*hz20sc->GetMinimum();   
+    hmean = hz20sc->GetBinContent(30);
+    //hmean = yq[0];
+    if (hmin< hmean*0.01) {hmin=hmean*0.01;}
+  }
+
 //  hmin=-0.2*(hsc_center->GetMaximum() - hsc_center->GetMinimum() )+ hsc_center->GetMinimum();
-  hmax=1.25*hz100sc->GetMaximum();//1.3*(hr100sc->GetMaximum() - hr100sc->GetMinimum() )+ hr100sc->GetMinimum();
+  hmax=1.25*hz100gxsc->GetMaximum();//1.3*(hr100sc->GetMaximum() - hr100sc->GetMinimum() )+ hr100sc->GetMinimum();
+   if (lograte)  {if (hmin<=maxscaledown*hmax) {
+         hmin=maxscaledown*hmax;
+        }}
+
+  cout<<"hmin"<<hmin<<endl;
+  cout<<"hmax"<<hmax<<endl;
+
+  if (lograte) {hmax= scalemax*hmax;}
   hz100sc->GetYaxis()->SetRangeUser(hmin, hmax);
  
   hz100sc->Draw();
@@ -866,7 +956,9 @@ fraction=1.;
   hz20gxsc->Draw("same");
 
   tcontent= TString::Format("%s", Particle.Data());
-  TLatex* ttp3 = new TLatex(60*0.05, 0.85*(hmax - hmin )+ hmin, tcontent.Data());
+//  TLatex* ttp3 = new TLatex(60*0.05, 0.85*(hmax - hmin )+ hmin, tcontent.Data());
+  TLatex* ttp3 = new TLatex(0.1955, 0.7025, tcontent.Data());
+  ttp3->SetNDC(kTRUE);
   ttp3->SetTextColor(kBlack);   
   ttp3->SetTextFont(43);
   ttp3->SetTextSize(30);
@@ -919,13 +1011,14 @@ fraction=1.;
 
 
 
-  double hrzmax = hrz50gxsc->GetBinContent(400,30)*1.2;
-
+  double hrzmax = hrz50gxsc->GetBinContent(480,30)*1.2;
+  double hrzmin = hrz50sc->GetBinContent(1,30)*0.8;
  //---single scatter
   TCanvas* c4 = new TCanvas("c4", "");
   c4->Draw();
   c4->cd();
-  hrz50sc->GetZaxis()->SetRangeUser(0, hrzmax);
+  if (lograte) {c4->SetLogz();}
+  hrz50sc->GetZaxis()->SetRangeUser(hrzmin, hrzmax);
 
   hrz50sc->Rebin2D(10, 1);
   hrz50sc->Scale(1./10/1);
@@ -937,11 +1030,21 @@ fraction=1.;
 
 
   tcontent= TString::Format("%s", Particle.Data());
-  TLatex* ttp4 = new TLatex(600*0.05, 0.85*(70 - 0 )+ 0, tcontent.Data());
+//  TLatex* ttp4 = new TLatex(600*0.05, 0.85*(70 - 0 )+ 0, tcontent.Data());
+  TLatex* ttp4 = new TLatex(0.1955, 0.7025, tcontent.Data());
+  ttp4->SetNDC(kTRUE);
   ttp4->SetTextColor(kBlack);   
   ttp4->SetTextFont(43);
   ttp4->SetTextSize(30);
   ttp4->Draw("same");
+
+  tcontent= TString::Format("event rate [cts mBq^{-1} kg^{-1} day^{-1}]");
+  TLatex* ttpn4 = new TLatex(0.6, 0.92, tcontent.Data());
+  ttpn4->SetNDC(kTRUE);
+  ttpn4->SetTextColor(kBlack);   
+  ttpn4->SetTextFont(43);
+  ttpn4->SetTextSize(15);
+  ttpn4->Draw("same");
 
 
   TLegend* tl4 = new TLegend(0.15,0.8,0.85,0.9);
@@ -970,7 +1073,9 @@ fraction=1.;
   TCanvas* c5 = new TCanvas("c5", "");
   c5->Draw();
   c5->cd();
-  hrz50gxsc->GetZaxis()->SetRangeUser(0, hrzmax);
+  if (lograte) {c5->SetLogz();}
+
+  hrz50gxsc->GetZaxis()->SetRangeUser(hrzmin, hrzmax);
 
   hrz50gxsc->Rebin2D(10, 1);
   hrz50gxsc->Scale(1./10/1);
@@ -982,12 +1087,21 @@ fraction=1.;
 
 
   tcontent= TString::Format("%s", Particle.Data());
-  TLatex* ttp5 = new TLatex(600*0.05, 0.85*(70 - 0 )+ 0, tcontent.Data());
+//  TLatex* ttp5 = new TLatex(600*0.05, 0.85*(70 - 0 )+ 0, tcontent.Data());
+  TLatex* ttp5 = new TLatex(0.1955, 0.7025, tcontent.Data());
+  ttp5->SetNDC(kTRUE);
   ttp5->SetTextColor(kBlack);   
   ttp5->SetTextFont(43);
   ttp5->SetTextSize(30);
   ttp5->Draw("same");
 
+  tcontent= TString::Format("event rate [cts mBq^{-1} kg^{-1} day^{-1}]");
+  TLatex* ttpn5 = new TLatex(0.6, 0.92, tcontent.Data());
+  ttpn5->SetNDC(kTRUE);
+  ttpn5->SetTextColor(kBlack);   
+  ttpn5->SetTextFont(43);
+  ttpn5->SetTextSize(15);
+  ttpn5->Draw("same");
 
   TLegend* tl5 = new TLegend(0.15,0.8,0.85,0.9);
   tl5->SetNColumns(3);
