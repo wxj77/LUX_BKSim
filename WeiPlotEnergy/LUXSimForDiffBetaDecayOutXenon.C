@@ -1011,17 +1011,19 @@ if (drawfunction){
 
 
 
-  double hrzmax = hrz50gxsc->GetBinContent(480,30)*1.2;
-  double hrzmin = hrz50sc->GetBinContent(1,30)*0.8;
+  double hrzmax = hrz50gxsc->GetBinContent(480,30)*1.3;
+  double hrzmin = hrz50sc->GetBinContent(1,30)*0.7;
  //---single scatter
   TCanvas* c4 = new TCanvas("c4", "");
   c4->Draw();
   c4->cd();
   if (lograte) {c4->SetLogz();}
-  hrz50sc->GetZaxis()->SetRangeUser(hrzmin, hrzmax);
+  
 
   hrz50sc->Rebin2D(10, 1);
   hrz50sc->Scale(1./10/1);
+
+hrz50sc->GetZaxis()->SetRangeUser(hrzmin, hrzmax);
   hrz50sc->Draw("colz");
 
   bcenter->Draw("same");
@@ -1075,12 +1077,14 @@ if (drawfunction){
   c5->cd();
   if (lograte) {c5->SetLogz();}
 
-  hrz50gxsc->GetZaxis()->SetRangeUser(hrzmin, hrzmax);
+
 
   hrz50gxsc->Rebin2D(10, 1);
   hrz50gxsc->Scale(1./10/1);
-  hrz50gxsc->Draw("colz");
 
+ hrz50gxsc->GetZaxis()->SetRangeUser(hrzmin, hrzmax);
+  hrz50gxsc->Draw("colz");
+ 
   bcenter->Draw("same");
   bfd->Draw("same");
   bskin->Draw("same");  
