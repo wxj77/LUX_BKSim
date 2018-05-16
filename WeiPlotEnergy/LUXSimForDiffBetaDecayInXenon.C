@@ -394,8 +394,8 @@ lzStyle->SetNumberContours(totcol);*/
   TH1F* hz50gxsc               = new TH1F("hz50gxsc", ";z [cm]; event rate at r center [cts (mBq /kg)^{-1} kg^{-1} day^{-1}]", 60, 0, 60);
   TH1F* hz20gxsc               = new TH1F("hz20gxsc", ";r^{2} [cm^{2}]; event rate at r center [cts (mBq /kg)^{-1} kg^{-1} day^{-1}]", 60, 0, 60);
 
-  TH2F* hrz50sc               = new TH2F("hrz50sc", ";r^{2} [cm^{2}];z [cm]", 600, 0, 600, 70, 0, 70);
-  TH2F* hrz50gxsc               = new TH2F("hrz50gxsc", ";r^{2} [cm^{2}];z [cm]", 600, 0, 600, 70, 0, 70);
+  TH2F* hrz50sc               = new TH2F("hrz50sc", ";r^{2} [cm^{2}];z [cm]; event rate [cts (mBq /kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 600, 0, 600, 70, 0, 70);
+  TH2F* hrz50gxsc               = new TH2F("hrz50gxsc", ";r^{2} [cm^{2}];z [cm]; event rate [cts (mBq /kg)^{-1} kg^{-1} day^{-1} keV^{-1}]", 600, 0, 600, 70, 0, 70);
 
 
  for (int ii=0; ii<numOfSim; ii++){
@@ -1019,7 +1019,7 @@ if (drawfunction){
   c4->Draw();
   c4->cd();
   if (lograte) {c4->SetLogz();}
-
+  if (lograte) {hrzmax=hrzmax*10; if (hrzmin<=hrzmax*maxscaledown) {hrzmin=hrzmax*maxscaledown;}}
 
   hrz50sc->Rebin2D(10, 1);
   hrz50sc->Scale(1./10/1);
@@ -1047,7 +1047,7 @@ if (drawfunction){
   ttpn4->SetTextColor(kBlack);   
   ttpn4->SetTextFont(43);
   ttpn4->SetTextSize(15);
-  ttpn4->Draw("same");
+//  ttpn4->Draw("same");
 
 
   TLegend* tl4 = new TLegend(0.15,0.8,0.85,0.9);
@@ -1077,7 +1077,7 @@ if (drawfunction){
   c5->Draw();
   c5->cd();
   if (lograte) {c5->SetLogz();}
-
+  if (lograte) {hrzmax=hrzmax*10; if (hrzmin<=hrzmax*maxscaledown) {hrzmin=hrzmax*maxscaledown;}}
 
 
   hrz50gxsc->Rebin2D(10, 1);
@@ -1106,7 +1106,7 @@ if (drawfunction){
   ttpn5->SetTextColor(kBlack);   
   ttpn5->SetTextFont(43);
   ttpn5->SetTextSize(15);
-  ttpn5->Draw("same");
+//  ttpn5->Draw("same");
 
   TLegend* tl5 = new TLegend(0.15,0.8,0.85,0.9);
   tl5->SetNColumns(3);
