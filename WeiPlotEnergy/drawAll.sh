@@ -22,7 +22,7 @@ function sourceName(){
   if [ "$s" = "Bi214" ]; then name="^{214}Bi beta decay";fi
 }
 
-for s in Kr85 Rn220 Rn222; do
+for s in Kr85 Rn220 Rn222 Pb210 Pb212 Pb214 Bi210 Bi212 Bi214; do
   ls ${folder}/${s}/rootfiles/*.root > test1.txt;
   ls ${folder}/${s}/Trimmed_Outputs/rootfiles/*.root >> test1.txt;
   sourceName
