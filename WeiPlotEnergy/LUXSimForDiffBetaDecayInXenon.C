@@ -145,7 +145,7 @@ int LUXSimForDiffBetaDecayInXenon(TString txtFileList = "test.txt", TString fOut
   lzStyle->SetPaperSize(20, 26);
   lzStyle->SetPadTopMargin(0.2);
   lzStyle->SetPadBottomMargin(0.15);
-  lzStyle->SetPadRightMargin(0.13); // 0.075 -> 0.13 for colz option
+  lzStyle->SetPadRightMargin(0.17); // 0.075 -> 0.13 for colz option
   lzStyle->SetPadLeftMargin(0.16);//to include both large/small font options
   
   // Fonts, sizes, offsets
